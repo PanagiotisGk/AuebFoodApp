@@ -1,0 +1,11 @@
+
+# Ενοποίηση γραμμών για cross-platform projects
+* text=auto
+
+# Χρήση LF για αρχεία κώδικα και Markdown
+*.java text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.gradle text eol=lf
+*.yml text eol=lf
+*.json text eol=lf

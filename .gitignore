@@ -1,0 +1,29 @@
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.iml
+target/
+build/
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Android/Gradle
+.gradle/
+local.properties
+*.keystore
+*.jks
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# OS files
+.DS_Store
+Thumbs.db
