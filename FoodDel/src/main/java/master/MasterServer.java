@@ -41,4 +41,8 @@ public class MasterServer {
         int index = hash % workers.size();
         return workers.get(index);
     }
+
+    public static List<WorkerConnection> getWorkers() {
+        return workers;
+    }
 }
