@@ -4,9 +4,13 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class Order implements Serializable {
-    private String storeName; // σε ποιο κατάστημα πάει η παραγγελία
-    private Map<String, Integer> productsOrdered; // όνομα προϊόντος -> ποσότητα
+    private String storeName;
+    private Map<String, Integer> productsOrdered;
     private double totalCost;
+
+    // 🟢 Default constructor (για Jackson)
+    public Order() {
+    }
 
     public Order(String storeName, Map<String, Integer> productsOrdered, double totalCost) {
         this.storeName = storeName;
@@ -31,4 +35,3 @@ public class Order implements Serializable {
         return "Παραγγελία προς: " + storeName + ", Προϊόντα: " + productsOrdered + ", Κόστος: " + totalCost + "€";
     }
 }
-

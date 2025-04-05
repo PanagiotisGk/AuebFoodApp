@@ -3,6 +3,7 @@ package master;
 import common.model.Request;
 import common.model.Response;
 import common.model.Store;
+import common.model.Order;
 
 import java.io.*;
 import java.net.Socket;
@@ -38,6 +39,23 @@ public class ClientHandler implements Runnable {
 
             while (true) {
                 switch (request.getType()) {
+
+                    case "ADD_ORDER":
+                        Order order = (Order) request.getPayload();
+                        System.out.println("📦 Παραγγελία προς: " + order.getStoreName());
+
+                        WorkerConnection worker = MasterServer.getWorkerForStore(order.getStoreName());
+                        if (worker == null) {
+                            out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
+                            break;
+                        }
+
+                        worker.sendRequest(request);
+                        Response orderResp = (Response) worker.getInputStream().readObject();
+                        out.writeObject(orderResp);
+                        break;
+
+
                     case "ADD_STORE":
                         Store store = (Store) request.getPayload();
                         System.out.println("📦 Επεξεργασία store: " + store.getStoreName());
