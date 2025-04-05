@@ -1,10 +1,16 @@
 package managerapp;
 
+
 import common.model.Order;
 import common.model.Request;
 import common.model.Response;
 import common.model.Store;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+
+
 
 import java.io.*;
 import java.net.Socket;
@@ -16,6 +22,7 @@ public class ManagerApp {
     private static final int MASTER_PORT = 5000;
 
     public static void main(String[] args) {
+
         try (
                 Socket socket = new Socket(MASTER_HOST, MASTER_PORT);
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -26,7 +33,7 @@ public class ManagerApp {
 
             while (true) {
                 System.out.println("\n===== MENU =====");
-                System.out.println("1. Καταχώρηση καταστήματος (store.json)");
+                System.out.println("1. Καταχώρηση καταστημάτων (store.json)");
                 System.out.println("2. Καταχώρηση παραγγελίας (order.json)");
                 System.out.println("0. Έξοδος");
                 System.out.print("👉 Επιλογή: ");
@@ -34,16 +41,20 @@ public class ManagerApp {
 
                 switch (choice) {
                     case 1:
-                        Store store = readStoreFromJson("store.json");
-                        if (store == null) break;
+                        List<Store> stores = readStoresFromJson("store.json");
+                        if (stores == null) break;
 
-                        System.out.println("📦 Κατάστημα διαβάστηκε: " + store);
-                        Request reqStore = new Request("ADD_STORE", store);
-                        out.writeObject(reqStore);
-                        out.flush();
+                        for (Store store : stores) {
+                            System.out.println("📦 Κατάστημα διαβάστηκε: " + store);
+                            Request reqStore = new Request("ADD_STORE", store);
+                            out.writeObject(reqStore);
+                            out.flush();
 
-                        Response resp1 = (Response) in.readObject();
-                        System.out.println("📥 Απάντηση: " + resp1.getMessage());
+                            Response resp1 = (Response) in.readObject();
+                            System.out.println("📥 Απάντηση: " + resp1.getMessage());
+
+                            Thread.sleep(100); // μικρή καθυστέρηση
+                        }
                         break;
 
                     case 2:
@@ -68,21 +79,23 @@ public class ManagerApp {
                 }
             }
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
             System.err.println("❌ Σφάλμα στο Manager: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static Store readStoreFromJson(String filename) {
+
+    private static List<Store> readStoresFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(new File(filename), Store.class);
+            return mapper.readValue(new File(filename), new TypeReference<List<Store>>() {});
         } catch (IOException e) {
             System.err.println("❌ Σφάλμα ανάγνωσης store.json: " + e.getMessage());
             return null;
         }
     }
+
 
     private static Order readOrderFromJson(String filename) {
         try {

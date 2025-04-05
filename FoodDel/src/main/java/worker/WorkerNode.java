@@ -2,15 +2,20 @@ package worker;
 
 import common.model.Request;
 import common.model.Response;
+import common.model.SearchFilters;
 import common.model.Store;
 import common.model.Order;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 
 public class WorkerNode {
 
@@ -83,8 +88,44 @@ public class WorkerNode {
                         out.writeObject(ok);
                         out.flush();
                         break;
+                    case "SEARCH_5KM_RANGE":
+                        SearchFilters filtersFor5kmRange = (SearchFilters) request.getPayload();
+                        List<Store> nearbyStores = new ArrayList<>();
 
 
+
+
+                        for (Store store5km : storeMap.values()) {
+                            double distance = distanceInKm(
+                                filtersFor5kmRange.getClientLatitude(),
+                                filtersFor5kmRange.getClientLongitude(),
+                                    store5km.getLatitude(),
+                                    store5km.getLongitude());
+
+                            if (distance <= 5) {
+                                nearbyStores.add(store5km);
+                            }
+                        }
+                        System.out.println("📦 Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
+                        Response response = new Response(true, "Καταστήματα σε ακτίνα 5km", nearbyStores);
+                        out.writeObject(response);
+                        out.flush();
+                        break;
+                    case "FILTER_STORES":
+                        System.out.println("📩 Worker έλαβε αίτημα: FILTER_STORES");
+                        SearchFilters filtersForStores = (SearchFilters) request.getPayload();
+                        List<Store> filteredStores = storeMap.values().stream()
+                            .filter(store1 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store1.getFoodCategory())))
+                            .filter(store1 -> store1.getStars() >= filtersForStores.getMinStars())
+                            // .filter(store -> (filtersForStores.getPriceRanges() == null || filtersForStores.getPriceRanges().contains(store.getPriceRange())))
+                            .collect(Collectors.toList());
+
+                        System.out.println("📦 Αποτελέσματα φίλτρων: " + filteredStores.size());
+                        Response filterResponse = new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores);
+                        out.writeObject(filterResponse);
+                        out.flush();
+                        break;
+                        
 
                     default:
                         Response error = new Response(false, "Άγνωστο αίτημα", null);
@@ -100,6 +141,18 @@ public class WorkerNode {
         }
     }
 
+    // Util for distance in km
+    private double distanceInKm(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371.0; // Earth radius in km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+    // main
     public static void main(String[] args) {
         WorkerNode worker = new WorkerNode();
         worker.start("localhost", 5000);
