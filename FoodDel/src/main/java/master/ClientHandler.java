@@ -115,9 +115,9 @@ public class ClientHandler implements Runnable {
                         SearchFilters filters = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearch5kmRange = new ArrayList<>();
                     
-                        for (WorkerConnection worker : MasterServer.getWorkers()) {
-                            worker.sendRequest(request);
-                            Response workerResponse = (Response) worker.getInputStream().readObject();
+                        for (WorkerConnection worker1 : MasterServer.getWorkers()) {
+                            worker1.sendRequest(request);
+                            Response workerResponse = (Response) worker1.getInputStream().readObject();
                     
                             if (workerResponse.isSuccess()) {
                                 List<Store> partial = (List<Store>) workerResponse.getData();
@@ -130,9 +130,9 @@ public class ClientHandler implements Runnable {
                         SearchFilters filterCriteria = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = new ArrayList<>();
                     
-                        for (WorkerConnection worker : MasterServer.getWorkers()) {
-                            worker.sendRequest(request);
-                            Response workerResponse = (Response) worker.getInputStream().readObject();
+                        for (WorkerConnection worker1 : MasterServer.getWorkers()) {
+                            worker1.sendRequest(request);
+                            Response workerResponse = (Response) worker1.getInputStream().readObject();
                     
                             if (workerResponse.isSuccess()) {
                                 List<Store> partialResults = (List<Store>) workerResponse.getData();

@@ -23,6 +23,8 @@ public class ManagerApp {
 
     public static void main(String[] args) {
 
+
+
         try (
                 Socket socket = new Socket(MASTER_HOST, MASTER_PORT);
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());

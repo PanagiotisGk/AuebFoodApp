@@ -115,8 +115,8 @@ public class WorkerNode {
                         System.out.println("📩 Worker έλαβε αίτημα: FILTER_STORES");
                         SearchFilters filtersForStores = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = storeMap.values().stream()
-                            .filter(store1 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store1.getFoodCategory())))
-                            .filter(store1 -> store1.getStars() >= filtersForStores.getMinStars())
+                            .filter(store2 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store2.getFoodCategory())))
+                            .filter(store2 -> store2.getStars() >= filtersForStores.getMinStars())
                             // .filter(store -> (filtersForStores.getPriceRanges() == null || filtersForStores.getPriceRanges().contains(store.getPriceRange())))
                             .collect(Collectors.toList());
 
