@@ -94,7 +94,11 @@ public class Store implements Serializable {
         return totalRevenue;
     }
 
-    public void addRevenue(double amount) {
+    // public void addRevenue(double amount) {
+    //     this.totalRevenue += amount;
+    // }
+
+    public synchronized void addRevenue(double amount) {
         this.totalRevenue += amount;
     }
 

@@ -49,10 +49,23 @@ public class WorkerNode {
                     case "ADD_ORDER":
                         Order order = (Order) request.getPayload();
                         String store = order.getStoreName();
-                        orderMap.computeIfAbsent(store, k -> new ArrayList<>()).add(order);
+                        // orderMap.computeIfAbsent(store, k -> new ArrayList<>()).add(order);
 
-                        // Έλεγχος αν υπάρχει το κατάστημα
-                        if (!storeMap.containsKey(store)) {
+                        // // Έλεγχος αν υπάρχει το κατάστημα
+                        // if (!storeMap.containsKey(store)) {
+                        //     System.out.println("❌ Παραγγελία για άγνωστο κατάστημα: " + store);
+                        //     Response fail = new Response(false, "Το κατάστημα δεν υπάρχει στον Worker", null);
+                        //     out.writeObject(fail);
+                        //     out.flush();
+                        //     break;
+                        // }
+
+                        // // Ενημέρωση εσόδων καταστήματος
+                        // storeMap.get(store).addRevenue(order.getTotalCost());
+
+                        // Έλεγχος ύπαρξης καταστήματος
+                        Store storeObj = storeMap.get(store);
+                        if (storeObj == null) {
                             System.out.println("❌ Παραγγελία για άγνωστο κατάστημα: " + store);
                             Response fail = new Response(false, "Το κατάστημα δεν υπάρχει στον Worker", null);
                             out.writeObject(fail);
@@ -60,8 +73,16 @@ public class WorkerNode {
                             break;
                         }
 
-                        // Ενημέρωση εσόδων καταστήματος
-                        storeMap.get(store).addRevenue(order.getTotalCost());
+                        // 🚨 Συγχρονισμός σε κάθε store ξεχωριστά
+                        synchronized (storeObj) {
+                            // Καταγραφή παραγγελίας
+                            orderMap.computeIfAbsent(store, k -> new ArrayList<>()).add(order);
+
+                            // Ενημέρωση εσόδων
+                            storeObj.addRevenue(order.getTotalCost());
+
+                            System.out.println("📥 Παραγγελία καταχωρήθηκε για: " + store);
+                        }
 
                         System.out.println("📥 Αποθηκεύτηκε παραγγελία για το κατάστημα: " + store);
                         Response okOrder = new Response(true, "Η παραγγελία καταχωρήθηκε", null);
@@ -73,17 +94,29 @@ public class WorkerNode {
                         Store store1 = (Store) request.getPayload();
                         String storeName = store1.getStoreName();
 
-                        if (storeMap.containsKey(storeName)) {
-                            System.out.println("⚠️ Το κατάστημα ήδη υπάρχει: " + storeName);
-                            Response alreadyExists = new Response(false, "Το κατάστημα υπάρχει ήδη", null);
-                            out.writeObject(alreadyExists);
-                            out.flush();
-                            break;
+                        // if (storeMap.containsKey(storeName)) {
+                        //     System.out.println("⚠️ Το κατάστημα ήδη υπάρχει: " + storeName);
+                        //     Response alreadyExists = new Response(false, "Το κατάστημα υπάρχει ήδη", null);
+                        //     out.writeObject(alreadyExists);
+                        //     out.flush();
+                        //     break;
+                        // }
+
+                        // storeMap.put(storeName, store1);
+
+                        synchronized (storeMap) {
+                            if (storeMap.containsKey(storeName)) {
+                                System.out.println("⚠️ Το κατάστημα ήδη υπάρχει: " + storeName);
+                                Response alreadyExists = new Response(false, "Το κατάστημα υπάρχει ήδη", null);
+                                out.writeObject(alreadyExists);
+                                out.flush();
+                                break;
+                            }
+                    
+                            storeMap.put(storeName, store1);
                         }
 
-                        storeMap.put(storeName, store1);
                         System.out.println("✅ Αποθηκεύτηκε το κατάστημα: " + storeName);
-
                         Response ok = new Response(true, "Το κατάστημα αποθηκεύτηκε", null);
                         out.writeObject(ok);
                         out.flush();
@@ -91,9 +124,6 @@ public class WorkerNode {
                     case "SEARCH_5KM_RANGE":
                         SearchFilters filtersFor5kmRange = (SearchFilters) request.getPayload();
                         List<Store> nearbyStores = new ArrayList<>();
-
-
-
 
                         for (Store store5km : storeMap.values()) {
                             double distance = distanceInKm(
