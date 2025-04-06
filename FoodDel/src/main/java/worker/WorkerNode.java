@@ -117,10 +117,11 @@ public class WorkerNode {
                         List<Store> filteredStores = storeMap.values().stream()
                             .filter(store2 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store2.getFoodCategory())))
                             .filter(store2 -> store2.getStars() >= filtersForStores.getMinStars())
-                            // .filter(store -> (filtersForStores.getPriceRanges() == null || filtersForStores.getPriceRanges().contains(store.getPriceRange())))
+                            .filter(store2 -> (filtersForStores.getPriceCategories() == null || filtersForStores.getPriceCategories().contains(store2.getPriceCategory())))
                             .collect(Collectors.toList());
 
                         System.out.println("📦 Αποτελέσματα φίλτρων: " + filteredStores.size());
+                        System.out.println("📦 Αποτελέσματα φίλτρων: " + filteredStores);
                         Response filterResponse = new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores);
                         out.writeObject(filterResponse);
                         out.flush();
@@ -153,6 +154,7 @@ public class WorkerNode {
         return R * c;
     }
     // main
+    // εδώ δηλώνουμε την ip και την port από την οποία θα τρέχει ο κάθε worker
     public static void main(String[] args) {
         WorkerNode worker = new WorkerNode();
         worker.start("localhost", 5000);

@@ -81,7 +81,7 @@ public class TestClient {
                     System.out.println(i + ". " + store.getStoreName());
                     System.out.println("   🍔 Κατηγορία: " + store.getFoodCategory());
                     System.out.println("   ⭐ Βαθμολογία: " + store.getStars() + "★");
-                    // System.out.println("   💰 Τιμή: " + store.getPriceCategories());
+                    System.out.println("   💰 Τιμή: " + store.getPriceCategory());
                     i++;
                 }
             }

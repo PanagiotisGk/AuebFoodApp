@@ -86,7 +86,8 @@ public class Store implements Serializable {
     }
 
     public String getPriceCategory() {
-        return priceCategory;
+        calculatePriceCategory(); // Κάθε φορά υπολογίζει με βάση τα τρέχοντα προϊόντα
+    return priceCategory;
     }
 
     public double getTotalRevenue() {
