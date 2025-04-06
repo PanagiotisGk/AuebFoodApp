@@ -1,0 +1,23 @@
+{
+    "storeName": "Pizza Fun",
+    "latitude": 37.9794,
+    "longitude": 23.7166,
+    "foodCategory": "pizzeria",
+    "stars": 4,
+    "noOfVotes": 100,
+    "storeLogo": "/images/Pizzafun-logo.png",
+    "products": [
+      {
+        "productName": "margarita",
+        "productType": "pizza",
+        "availableAmount": 100,
+        "price": 8.5
+      },
+      {
+        "productName": "salad",
+        "productType": "salad",
+        "availableAmount": 50,
+        "price": 4.0
+      }
+    ]
+  }

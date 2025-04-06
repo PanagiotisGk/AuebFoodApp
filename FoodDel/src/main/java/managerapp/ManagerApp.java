@@ -43,7 +43,7 @@ public class ManagerApp {
 
                 switch (choice) {
                     case 1:
-                        List<Store> stores = readStoresFromJson("store.json");
+                        List<Store> stores = readStoresFromJson("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/store.json");
                         if (stores == null) break;
 
                         for (Store store : stores) {
@@ -60,7 +60,7 @@ public class ManagerApp {
                         break;
 
                     case 2:
-                        Order order = readOrderFromJson("order.json");
+                        Order order = readOrderFromJson("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/order.json");
                         if (order == null) break;
 
                         System.out.println("🛒 Παραγγελία διαβάστηκε: " + order);

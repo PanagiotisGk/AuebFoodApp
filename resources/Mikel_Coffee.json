@@ -1,0 +1,23 @@
+{
+    "storeName": "Mikel Coffee",
+    "latitude": 38.0450,
+    "longitude": 23.8100,
+    "foodCategory": "coffee",
+    "stars": 4.8,
+    "noOfVotes": 130,
+    "storeLogo": "/images/Lartigiano-Logo.png",
+    "products": [
+      {
+        "productName": "chicken sandwich",
+        "productType": "sandwich",
+        "availableAmount": 50,
+        "price": 6
+      },
+      {
+        "productName": "chef salad",
+        "productType": "salad",
+        "availableAmount": 70,
+        "price": 5.0
+      }
+    ]
+  }

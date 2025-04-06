@@ -1,0 +1,23 @@
+{
+    "storeName": "Lartigiano Pizza",
+    "latitude": 37.9716,
+    "longitude": 23.7258,
+    "foodCategory": "pizzeria",
+    "stars": 3.8,
+    "noOfVotes": 120,
+    "storeLogo": "/images/Lartigiano-Logo.png",
+    "products": [
+      {
+        "productName": "margarita",
+        "productType": "pizza",
+        "availableAmount": 50,
+        "price": 9
+      },
+      {
+        "productName": "chef salad",
+        "productType": "salad",
+        "availableAmount": 70,
+        "price": 5.0
+      }
+    ]
+  }
