@@ -12,11 +12,20 @@ public class Product implements Serializable {
     public Product() {
     }
 
+
+
     // ✅ Full constructor (για σένα)
     public Product(String productName, String productType, int availableAmount, double price) {
         this.productName = productName;
         this.productType = productType;
         this.availableAmount = availableAmount;
+        this.price = price;
+    }
+
+    public Product(String productName, double price) {
+        this.productName = productName;
+        this.productType = "unknown";
+        this.availableAmount = 1;
         this.price = price;
     }
 
@@ -38,6 +47,14 @@ public class Product implements Serializable {
 
     public void setAvailableAmount(int availableAmount) {
         this.availableAmount = availableAmount;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
     }
 
     @Override

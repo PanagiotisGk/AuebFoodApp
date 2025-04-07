@@ -13,6 +13,12 @@ public class Response implements Serializable {
         this.data = data;
     }
 
+    private Object payload;
+
+    public Object getPayload() {
+        return payload;
+    }
+
     public boolean isSuccess() {
         return success;
     }

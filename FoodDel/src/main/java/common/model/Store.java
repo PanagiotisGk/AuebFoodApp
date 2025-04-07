@@ -17,11 +17,9 @@ public class Store implements Serializable {
     private String priceCategory;
     private double totalRevenue;
 
-    // ✅ Default constructor (ΑΠΑΡΑΙΤΗΤΟΣ για Jackson)
     public Store() {
     }
 
-    // ✅ Constructor με όλα τα πεδία
     public Store(String storeName, double latitude, double longitude, String foodCategory,
                  int stars, int noOfVotes, String storeLogo, List<Product> products) {
         this.storeName = storeName;
@@ -36,7 +34,19 @@ public class Store implements Serializable {
         calculatePriceCategory();
     }
 
-    // Υπολογισμός κατηγορίας τιμής
+    public void addProduct(String name, double price) {
+        products.add(new Product(name, "unknown", 1, price));
+        calculatePriceCategory();
+    }
+
+    public boolean removeProduct(String name) {
+        boolean removed = products.removeIf(p -> p.getProductName().equalsIgnoreCase(name));
+        if (removed) {
+            calculatePriceCategory();
+        }
+        return removed;
+    }
+
     private void calculatePriceCategory() {
         if (products == null || products.isEmpty()) {
             priceCategory = "$";
@@ -52,6 +62,8 @@ public class Store implements Serializable {
             priceCategory = "$$$";
         }
     }
+
+
 
     public String getStoreName() {
         return storeName;

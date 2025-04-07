@@ -5,6 +5,7 @@ import common.model.Response;
 import common.model.SearchFilters;
 import common.model.Store;
 import common.model.Order;
+import common.model.UpdateProductRequest;
 
 import java.io.*;
 import java.net.Socket;
@@ -42,20 +43,49 @@ public class ClientHandler implements Runnable {
             while (true) {
                 switch (request.getType()) {
 
-                    case "ADD_ORDER":
-                        Order order = (Order) request.getPayload();
-                        System.out.println("📦 Παραγγελία προς: " + order.getStoreName());
-
-                        WorkerConnection worker = MasterServer.getWorkerForStore(order.getStoreName());
+                    case "GET_PRODUCTS":
+                        String storeName = (String) request.getPayload();
+                        WorkerConnection worker = MasterServer.getWorkerForStore(storeName);
                         if (worker == null) {
-                            out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
+                            out.writeObject(new Response(false, "❌ Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
 
                         worker.sendRequest(request);
-                        Response orderResp = (Response) worker.getInputStream().readObject();
+                        Response resp = (Response) worker.getInputStream().readObject();
+                        System.out.println("⬅️ Worker Response: success=" + resp.isSuccess() + ", data=" + resp.getData());
+                        out.writeObject(resp);
+                        break;
+
+
+                    case "ADD_ORDER":
+                        Order order = (Order) request.getPayload();
+                        System.out.println("📦 Παραγγελία προς: " + order.getStoreName());
+
+                        WorkerConnection worker1 = MasterServer.getWorkerForStore(order.getStoreName());
+                        if (worker1 == null) {
+                            out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
+                            break;
+                        }
+
+                        worker1.sendRequest(request);
+                        Response orderResp = (Response) worker1.getInputStream().readObject();
                         out.writeObject(orderResp);
                         break;
+
+                    case "UPDATE_PRODUCTS":
+                        String storeName1 = ((UpdateProductRequest) request.getPayload()).getStoreName();
+                        WorkerConnection chosenWorker = MasterServer.getWorkerForStore(storeName1);
+                        if (chosenWorker == null) {
+                            out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
+                            break;
+                        }
+
+                        chosenWorker.sendRequest(request);
+                        Response updateResp = (Response) chosenWorker.getInputStream().readObject();
+                        out.writeObject(updateResp);
+                        break;
+
 
 
                     case "ADD_STORE":
@@ -82,9 +112,9 @@ public class ClientHandler implements Runnable {
                         SearchFilters filters = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearch5kmRange = new ArrayList<>();
                     
-                        for (WorkerConnection worker1 : MasterServer.getWorkers()) {
-                            worker1.sendRequest(request);
-                            Response workerResponse = (Response) worker1.getInputStream().readObject();
+                        for (WorkerConnection worker2 : MasterServer.getWorkers()) {
+                            worker2.sendRequest(request);
+                            Response workerResponse = (Response) worker2.getInputStream().readObject();
                     
                             if (workerResponse.isSuccess()) {
                                 List<Store> partial = (List<Store>) workerResponse.getData();
@@ -97,9 +127,9 @@ public class ClientHandler implements Runnable {
                         SearchFilters filterCriteria = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = new ArrayList<>();
                     
-                        for (WorkerConnection worker1 : MasterServer.getWorkers()) {
-                            worker1.sendRequest(request);
-                            Response workerResponse = (Response) worker1.getInputStream().readObject();
+                        for (WorkerConnection worker2 : MasterServer.getWorkers()) {
+                            worker2.sendRequest(request);
+                            Response workerResponse = (Response) worker2.getInputStream().readObject();
                     
                             if (workerResponse.isSuccess()) {
                                 List<Store> partialResults = (List<Store>) workerResponse.getData();

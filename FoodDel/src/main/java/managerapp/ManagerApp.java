@@ -4,15 +4,16 @@ import common.model.Order;
 import common.model.Request;
 import common.model.Response;
 import common.model.Store;
+import common.model.UpdateProductRequest;
+import common.model.Product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ManagerApp {
@@ -25,90 +26,167 @@ public class ManagerApp {
         try (
                 Socket socket = new Socket(MASTER_HOST, MASTER_PORT);
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                 Scanner scanner = new Scanner(System.in)
         ) {
-            System.out.println("📡 Συνδέθηκα με τον Master");
+            out.flush();
+            System.out.println("Συνδέθηκα με τον Master");
+            List<String> addedStores = new ArrayList<>();
 
-            
             while (true) {
                 System.out.println("\n===== MENU =====");
                 System.out.println("1. Καταχώρηση καταστημάτων ");
                 System.out.println("2. Καταχώρηση παραγγελίας (order.json)");
+                System.out.println("3. Ενημέρωση προϊόντων καταστήματος (ADD / REMOVE / REDUCE)");
+                System.out.println("4. Προβολή προϊόντων καταστήματος");
                 System.out.println("0. Έξοδος");
-                System.out.print("👉 Επιλογή: ");
+                System.out.print("Επιλογή: ");
                 int choice = Integer.parseInt(scanner.nextLine());
+
 
                 switch (choice) {
                     case 1:
-                        List<String> addedStores = new ArrayList<>();
 
-                        String path = "";
-                        // Ερώτηση στον χρήστη για το άν θέλει να βρει το .json με το full path ή χωρίς
-                        while (true) {
-                            System.out.println("Χρειάζεται το full path για την εύρεση του καταστήματος ή όχι;;; (Απάντησε με YES ή NO) ");
-                            String fullPathResources = scanner.nextLine().trim();
 
-                            if (fullPathResources.isEmpty()) {
-                                System.out.println("⚠️ Δεν έδωσες απάντηση. Προσπάθησε ξανά.");
-                                continue;
-                            }
-                            if (fullPathResources.equalsIgnoreCase("yes") || fullPathResources.equalsIgnoreCase("y")) {
-                                System.out.println("✅ Επιλέχθηκε χρήση full path για καταστήματα.");
-                                path = "/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/";
-                            } else {
-                                System.out.println("❌ Δεν θα χρησιμοποιηθεί full path για καταστήματα.");
-                                // path = storeName + ".json";
-                            }
-                            break;
-                        }
-                        // Εκτύπωση των διαθέσιμων καταστημάτων για εισαγωγή και επιλογή καταστήματος για προσθήκη
+
                         while (true) {
-                            // ✅ Εκτύπωση διαθέσιμων αρχείων καταστημάτων
-                            printAvailableStores(path);
-                            System.out.print("📍 Δώσε το όνομα του καταστήματος με την μορφή π.χ. Dommino_Pizza (ή 'τέλος' για έξοδο στο menu): ");
+                            printAvailableStores("resources/", addedStores);
+
+                            System.out.print("📍 Δώσε το όνομα του καταστήματος τύπου Pizza_Fun (ή 'τέλος' για έξοδο): ");
                             String storeName = scanner.nextLine().trim();
-                    
+
                             if (storeName.equalsIgnoreCase("τέλος") || storeName.equalsIgnoreCase("τελος")) break;
-                            path += storeName + ".json"; 
-                    
+
                             if (addedStores.contains(storeName)) {
-                                System.out.println("⚠️ Το κατάστημα '" + storeName + "' έχει ήδη προστεθεί. Μπορείς να προσθέσεις κάποιο άλλο εάν θέλεις...");
+                                System.out.println("⚠️ Το κατάστημα '" + storeName + "' έχει ήδη προστεθεί.");
                                 continue;
-                            }                            
-                            Store store = readStoreFromJson(path);
-                    
-                            if (store == null) continue;
-                    
+                            }
+
+                            String storeFilePath = "resources/" + storeName + ".json";
+                            System.out.println("📂 Διαβάζω από αρχείο: " + storeFilePath);
+
+                            Store store = readStoreFromJson(storeFilePath);
+                            if (store == null) {
+                                System.out.println("❌ Δεν βρέθηκε το αρχείο ή είχε σφάλμα.");
+                                continue;
+                            }
+
                             System.out.println("📦 Κατάστημα διαβάστηκε: " + store);
                             Request reqStore = new Request("ADD_STORE", store);
                             out.writeObject(reqStore);
                             out.flush();
-                    
+
                             Response resp = (Response) in.readObject();
                             System.out.println("📥 Απάντηση: " + resp.getMessage());
-                    
+
                             addedStores.add(storeName);
                             Thread.sleep(100);
-                            break;
                         }
                         break;
-                        
+
+
                     case 2:
-                        Order order = readOrderFromJson("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/order.json");
+                        Order order = readOrderFromJson("resources/order.json");
                         if (order == null) break;
 
-                        System.out.println("🛒 Παραγγελία διαβάστηκε: " + order);
+                        System.out.println("Παραγγελία διαβάστηκε: " + order);
                         Request reqOrder = new Request("ADD_ORDER", order);
                         out.writeObject(reqOrder);
                         out.flush();
 
                         Response resp2 = (Response) in.readObject();
-                        System.out.println("📥 Απάντηση: " + resp2.getMessage());
+                        System.out.println("Απάντηση: " + resp2.getMessage());
+                        break;
+
+                    case 3:
+                        System.out.print("Κατάστημα: ");
+                        String storeName = scanner.nextLine();
+
+                        System.out.print("Όνομα προϊόντος: ");
+                        String productName = scanner.nextLine();
+
+                        System.out.print("Ενέργεια (ADD / REMOVE): ");
+                        String action = scanner.nextLine().toUpperCase();
+
+                        String productType = "unknown";
+                        int quantity = 1;
+                        double price = 0.0;
+
+                        if ("ADD".equals(action)) {
+                            System.out.print("Τύπος προϊόντος (ή Enter για καμία αλλαγή): ");
+                            productType = scanner.nextLine().trim();
+                            if (productType.isEmpty()) productType = "null";
+
+                            System.out.print("Ποσότητα διαθέσιμη (ή -1 για καμία αλλαγή): ");
+                            quantity = Integer.parseInt(scanner.nextLine().trim());
+
+                            System.out.print("Τιμή προϊόντος (ή -1 για καμία αλλαγή): ");
+                            price = Double.parseDouble(scanner.nextLine().trim());
+                        }
+
+                        UpdateProductRequest upr = new UpdateProductRequest(
+                                storeName, productName, productType, quantity, price, action
+                        );
+                        Request req = new Request("UPDATE_PRODUCTS", upr);
+                        out.writeObject(req);
+                        out.flush();
+
+                        Response resp = (Response) in.readObject();
+                        System.out.println("Απάντηση: " + resp.getMessage());
+                        break;
+
+
+                    case 4:
+
+                        if (addedStores.isEmpty()) {
+                            System.out.println("⚠️ Δεν υπάρχουν καταχωρημένα καταστήματα.");
+                            break;
+                        }
+
+                        System.out.println("📋 Καταχωρημένα καταστήματα:");
+                        for (String store : addedStores) {
+                            System.out.println(" - " + store);
+                        }
+                        System.out.print("Όνομα καταστήματος: ");
+                        String storeName1 = scanner.nextLine();
+
+                        Request getProductsReq = new Request("GET_PRODUCTS", storeName1);
+                        out.writeObject(getProductsReq);
+                        out.flush();
+
+                        Response productResp = (Response) in.readObject();
+                        Object payload = productResp.getPayload();
+
+
+                        if (productResp.isSuccess()) {
+                            if (payload instanceof List<?>) {
+                                List<?> rawList = (List<?>) payload;
+                                List<Product> prods = new ArrayList<>();
+                                for (Object o : rawList) {
+                                    if (o instanceof Product) {
+                                        prods.add((Product) o);
+                                    }
+                                }
+
+                                if (prods.isEmpty()) {
+                                    System.out.println("⚠️ Το κατάστημα δεν έχει καταχωρημένα προϊόντα.");
+                                } else {
+                                    System.out.println("Προϊόντα καταστήματος " + storeName1 + ":");
+                                    for (Product p : prods) {
+                                        System.out.println(" - " + p);
+                                    }
+                                }
+                            } else {
+                                System.out.println("📋 Διαθέσιμα τα προϊόντα του καταστήματος " + storeName1);
+                            }
+                        } else {
+                            System.out.println("❌ " + productResp.getMessage());
+                        }
                         break;
 
                     case 0:
-                        System.out.println("👋 Έξοδος...");
+                        System.out.println("Έξοδος...");
                         return;
 
                     default:
@@ -122,7 +200,6 @@ public class ManagerApp {
         }
     }
 
-    // Συνάρτηση η οποία διαβάζει τα στοιχεία κάθε καταστήματα από το αντίστοιχο json
     private static Store readStoreFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -133,7 +210,6 @@ public class ManagerApp {
         }
     }
 
-    // Συνάρτηση η οποία διαβάζει τα στοιχεία κάθε παραγγελίας από το αντίστοιχο json
     private static Order readOrderFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -143,26 +219,30 @@ public class ManagerApp {
             return null;
         }
     }
-    // Συνάρτηση για την εμφάνιση των διαθέσιμων καταστημάτων για εισαγωγή
-    private static void printAvailableStores(String folderPath) {
+
+    private static void printAvailableStores(String folderPath, List<String> exclude) {
         File folder = new File(folderPath);
-    
+
         if (!folder.exists() || !folder.isDirectory()) {
             System.out.println("❌ Ο φάκελος δεν υπάρχει ή δεν είναι φάκελος.");
             return;
         }
-    
+
         File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
-    
+
         if (files == null || files.length == 0) {
             System.out.println("⚠️ Δεν βρέθηκαν διαθέσιμα καταστήματα στο φάκελο.");
             return;
         }
-    
+
         System.out.println("📋 Διαθέσιμα καταστήματα για εισαγωγή:");
+
         for (File file : files) {
             String fileName = file.getName().replace(".json", "");
-            System.out.println("  - " + fileName);
+            if (!exclude.contains(fileName)) {
+                System.out.println("  - " + fileName);
+            }
         }
     }
+
 }

@@ -5,6 +5,8 @@ import common.model.Response;
 import common.model.SearchFilters;
 import common.model.Store;
 import common.model.Order;
+import common.model.UpdateProductRequest;
+import common.model.Product;
 
 import java.io.*;
 import java.net.Socket;
@@ -45,6 +47,163 @@ public class WorkerNode {
                 System.out.println("📩 Worker έλαβε αίτημα: " + request.getType());
 
                 switch (request.getType()) {
+
+
+                    case "GET_PRODUCTS":
+                        String requestedStore = (String) request.getPayload();
+                        System.out.println("🔍 Ζητήθηκε κατάστημα: '" + requestedStore + "'");
+                        System.out.println("📦 Καταστήματα στον Worker: " + storeMap.keySet());
+
+                        Store s = storeMap.get(requestedStore);
+                        if (s == null) {
+                            System.out.println("❌ Δεν βρέθηκε το κατάστημα στον Worker.");
+                            out.writeObject(new Response(false, "❌ Το κατάστημα δεν βρέθηκε", null));
+                        } else {
+                            System.out.println("✅ Βρέθηκε! Επιστρέφονται προϊόντα: " + s.getProducts());
+                            out.writeObject(new Response(true, "📦 Προϊόντα καταστήματος", s.getProducts()));
+                        }
+                        System.out.println("➡️ Πλήθος προϊόντων: " + (s.getProducts() != null ? s.getProducts().size() : "null"));
+                        out.flush();
+                        break;
+
+
+
+
+
+                    case "UPDATE_PRODUCTS":
+                        UpdateProductRequest upr = (UpdateProductRequest) request.getPayload();
+                        String sName = upr.getStoreName();
+
+                        if (!storeMap.containsKey(sName)) {
+                            out.writeObject(new Response(false, "❌ Το κατάστημα δεν υπάρχει", null));
+                            out.flush();
+                            break;
+                        }
+
+                        Store s1 = storeMap.get(sName);
+
+                        if ("ADD".equalsIgnoreCase(upr.getAction())) {
+                            boolean updated = false;
+
+                            for (Product p : s1.getProducts()) {
+                                if (p.getProductName().equalsIgnoreCase(upr.getProductName())) {
+
+                                    // 🔢 Προσθήκη ποσότητας (αν > 0)
+                                    if (upr.getAvailableAmount() > 0) {
+                                        int prev = p.getAvailableAmount();
+                                        int newAmount = prev + upr.getAvailableAmount();
+                                        p.setAvailableAmount(newAmount);
+                                        System.out.println("📦 Προστέθηκαν " + upr.getAvailableAmount() + " τεμάχια στο προϊόν '" + p.getProductName() + "'. Νέα ποσότητα: " + newAmount);
+                                    }
+
+                                    // 💰 Αλλαγή τιμής
+                                    if (upr.getPrice() > 0 && p.getPrice() != upr.getPrice()) {
+                                        System.out.println("ℹ️ Ενημερώθηκε η τιμή προϊόντος '" + p.getProductName() + "' από " + p.getPrice() + "€ σε " + upr.getPrice() + "€");
+                                        p.setPrice(upr.getPrice());
+                                    }
+
+                                    // 🏷️ Αλλαγή τύπου
+                                    if (upr.getProductType() != null && !upr.getProductType().equalsIgnoreCase("null") &&
+                                            !p.getProductType().equalsIgnoreCase(upr.getProductType())) {
+                                        System.out.println("ℹ️ Ενημερώθηκε ο τύπος προϊόντος '" + p.getProductName() + "' από " + p.getProductType() + " σε " + upr.getProductType());
+                                        p.setProductType(upr.getProductType());
+                                    }
+
+                                    updated = true;
+                                    break;
+                                }
+                            }
+
+
+                            if (!updated) {
+                                // Για νέο προϊόν απαιτούνται όλα τα πεδία
+                                if (upr.getAvailableAmount() <= 0 || upr.getPrice() <= 0 ||
+                                        upr.getProductType() == null || upr.getProductType().equalsIgnoreCase("null")) {
+                                    out.writeObject(new Response(false, "❌ Για νέα προϊόντα απαιτείται θετική ποσότητα, τιμή και έγκυρος τύπος", null));
+                                } else {
+                                    Product newProd = new Product(
+                                            upr.getProductName(),
+                                            upr.getProductType(),
+                                            upr.getAvailableAmount(),
+                                            upr.getPrice()
+                                    );
+                                    s1.getProducts().add(newProd);
+                                    out.writeObject(new Response(true, "✅ Προστέθηκε νέο προϊόν", null));
+                                }
+                            } else {
+                                out.writeObject(new Response(true, "♻️ Ενημερώθηκε το προϊόν", null));
+                            }
+
+                        } else if ("REMOVE".equalsIgnoreCase(upr.getAction())) {
+                            boolean removed = s1.removeProduct(upr.getProductName());
+                            if (removed) {
+                                System.out.println("🗑️ Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "' από το κατάστημα '" + s1.getStoreName() + "'");
+                                out.writeObject(new Response(true, "✅ Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "'", null));
+                            } else {
+                                System.out.println("⚠️ Το προϊόν '" + upr.getProductName() + "' δεν βρέθηκε στο κατάστημα '" + s1.getStoreName() + "'");
+                                out.writeObject(new Response(false, "❌ Το προϊόν δεν βρέθηκε", null));
+                            }
+                        }
+
+                        out.flush();
+                        break;
+
+                    case "REDUCE":
+                        UpdateProductRequest reduceReq = (UpdateProductRequest) request.getPayload();
+                        Store targetStore = storeMap.get(reduceReq.getStoreName());
+
+                        if (targetStore == null) {
+                            out.writeObject(new Response(false, "❌ Το κατάστημα δεν υπάρχει", null));
+                            out.flush();
+                            break;
+                        }
+
+                        boolean found = false;
+                        final int MIN_AMOUNT = 5; // 🟠 Ελάχιστο όριο ποσότητας
+
+                        for (Product p : targetStore.getProducts()) {
+                            if (p.getProductName().equalsIgnoreCase(reduceReq.getProductName())) {
+                                int current = p.getAvailableAmount();
+                                int toRemove = reduceReq.getAvailableAmount();
+
+                                if (toRemove <= 0) {
+                                    out.writeObject(new Response(false, "❌ Η ποσότητα προς αφαίρεση πρέπει να είναι θετική", null));
+                                    out.flush();
+                                    break;
+                                }
+
+                                if (current < toRemove) {
+                                    out.writeObject(new Response(false, "❌ Δεν υπάρχει αρκετό απόθεμα για αφαίρεση (" + current + " διαθέσιμα)", null));
+                                    out.flush();
+                                    break;
+                                }
+
+                                int newAmount = current - toRemove;
+                                p.setAvailableAmount(newAmount);
+
+                                System.out.println("📉 Αφαιρέθηκαν " + toRemove + " τεμάχια από '" + p.getProductName() +
+                                        "'. Νέα ποσότητα: " + newAmount);
+
+                                if (newAmount <= MIN_AMOUNT) {
+                                    System.out.println("⚠️ ΠΡΟΕΙΔΟΠΟΙΗΣΗ: Το προϊόν '" + p.getProductName() +
+                                            "' έχει πολύ χαμηλό απόθεμα (" + newAmount + " τεμάχια)");
+                                }
+
+                                out.writeObject(new Response(true, "✅ Αφαιρέθηκαν " + toRemove + " τεμάχια από '" + p.getProductName() + "'", null));
+                                out.flush();
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found) {
+                            out.writeObject(new Response(false, "❌ Το προϊόν δεν βρέθηκε στο κατάστημα", null));
+                            out.flush();
+                        }
+
+                        break;
+
+
 
                     case "ADD_ORDER":
                         Order order = (Order) request.getPayload();
@@ -116,8 +275,11 @@ public class WorkerNode {
                             storeMap.put(storeName, store1);
                         }
 
-                        System.out.println("✅ Αποθηκεύτηκε το κατάστημα: " + storeName);
+
                         Response ok = new Response(true, "Το κατάστημα αποθηκεύτηκε", null);
+                        System.out.println("📨 Λήφθηκε αίτημα προσθήκης καταστήματος...");
+                        System.out.println("➡️ Όνομα: " + store1.getStoreName());
+                        System.out.println("➡️ Προϊόντα: " + store1.getProducts());
                         out.writeObject(ok);
                         out.flush();
                         break;
