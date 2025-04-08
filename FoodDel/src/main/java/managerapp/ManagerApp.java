@@ -10,6 +10,8 @@ import common.model.Product;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.io.*;
 import java.net.Socket;
@@ -40,6 +42,7 @@ public class ManagerApp {
                 System.out.println("2. Καταχώρηση παραγγελίας (order.json)");
                 System.out.println("3. Ενημέρωση προϊόντων καταστήματος (ADD / REMOVE / REDUCE)");
                 System.out.println("4. Προβολή προϊόντων καταστήματος");
+                System.out.println("5. Προβολή συνολικών πωλήσεων ανά προϊόν");
                 System.out.println("0. Έξοδος");
                 System.out.print("Επιλογή: ");
                 int choice = Integer.parseInt(scanner.nextLine());
@@ -47,8 +50,6 @@ public class ManagerApp {
 
                 switch (choice) {
                     case 1:
-
-
 
                         while (true) {
                             printAvailableStores("resources/", addedStores);
@@ -184,6 +185,43 @@ public class ManagerApp {
                             System.out.println("❌ " + productResp.getMessage());
                         }
                         break;
+
+                    case 5:
+                        Request salesReq = new Request("PRODUCT_SALES", null);
+                        out.writeObject(salesReq);
+                        out.flush();
+
+                        Response salesResp = (Response) in.readObject();
+
+                        Object payload1 = salesResp.getPayload();
+
+                        if (payload1 instanceof Map<?, ?>) {
+                            Map<?, ?> rawMap = (Map<?, ?>) payload1;
+
+                            // Δημιουργούμε νέο Map με σωστά generics
+                            Map<String, Integer> sales = new HashMap<>();
+                            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                                if (entry.getKey() instanceof String && entry.getValue() instanceof Integer) {
+                                    sales.put((String) entry.getKey(), (Integer) entry.getValue());
+                                }
+                            }
+
+                            if (sales.isEmpty()) {
+                                System.out.println("⚠️ Δεν υπάρχουν ακόμα καταγεγραμμένες πωλήσεις.");
+                            } else {
+                                System.out.println("📊 Συνολικές Πωλήσεις ανά προϊόν:");
+                                sales.entrySet().stream()
+                                        .sorted(Map.Entry.comparingByKey())
+                                        .forEach(entry -> System.out.println(" - " + entry.getKey() + ": " + entry.getValue() + " πωλήσεις"));
+
+                            }
+
+                        } else {
+                            System.out.println("❌ Το payload των πωλήσεων δεν ήταν έγκυρος πίνακας.");
+                        }
+
+                        break;
+
 
                     case 0:
                         System.out.println("Έξοδος...");

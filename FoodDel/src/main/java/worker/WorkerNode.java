@@ -25,6 +25,8 @@ public class WorkerNode {
 
     private final Map<String, List<Order>> orderMap = new HashMap<>();
 
+    private Map<String, Integer> productSales = new HashMap<>();
+
 
 
     public void start(String masterHost, int masterPort) {
@@ -47,6 +49,18 @@ public class WorkerNode {
                 System.out.println("📩 Worker έλαβε αίτημα: " + request.getType());
 
                 switch (request.getType()) {
+
+                    case "PRODUCT_SALES":
+                        if (productSales == null || productSales.isEmpty()) {
+                            out.writeObject(new Response(true, "📊 Καμία καταγεγραμμένη πώληση", new HashMap<String, Integer>()));
+                        } else {
+                            out.writeObject(new Response(true, "📊 Συνολικές πωλήσεις", productSales));
+                        }
+                        out.flush();
+                        break;
+
+
+
 
 
                     case "GET_PRODUCTS":
@@ -207,47 +221,75 @@ public class WorkerNode {
 
                     case "ADD_ORDER":
                         Order order = (Order) request.getPayload();
-                        String store = order.getStoreName();
-                        // orderMap.computeIfAbsent(store, k -> new ArrayList<>()).add(order);
+                        String targetStore1 = order.getStoreName();
 
-                        // // Έλεγχος αν υπάρχει το κατάστημα
-                        // if (!storeMap.containsKey(store)) {
-                        //     System.out.println("❌ Παραγγελία για άγνωστο κατάστημα: " + store);
-                        //     Response fail = new Response(false, "Το κατάστημα δεν υπάρχει στον Worker", null);
-                        //     out.writeObject(fail);
-                        //     out.flush();
-                        //     break;
-                        // }
-
-                        // // Ενημέρωση εσόδων καταστήματος
-                        // storeMap.get(store).addRevenue(order.getTotalCost());
-
-                        // Έλεγχος ύπαρξης καταστήματος
-                        Store storeObj = storeMap.get(store);
-                        if (storeObj == null) {
-                            System.out.println("❌ Παραγγελία για άγνωστο κατάστημα: " + store);
-                            Response fail = new Response(false, "Το κατάστημα δεν υπάρχει στον Worker", null);
-                            out.writeObject(fail);
+                        // Ελέγχουμε αν το κατάστημα υπάρχει
+                        if (!storeMap.containsKey(targetStore1)) {
+                            out.writeObject(new Response(false, "❌ Το κατάστημα δεν υπάρχει", null));
                             out.flush();
                             break;
                         }
 
-                        // 🚨 Συγχρονισμός σε κάθε store ξεχωριστά
-                        synchronized (storeObj) {
-                            // Καταγραφή παραγγελίας
-                            orderMap.computeIfAbsent(store, k -> new ArrayList<>()).add(order);
+                        Store store = storeMap.get(targetStore1);
+                        List<Product> orderProducts = order.getProducts();
+                        List<Product> storeProducts = store.getProducts();
 
-                            // Ενημέρωση εσόδων
-                            storeObj.addRevenue(order.getTotalCost());
+                        boolean allAvailable = true;
 
-                            System.out.println("📥 Παραγγελία καταχωρήθηκε για: " + store);
+                        // Έλεγχος διαθεσιμότητας προϊόντων
+                        for (Product ordered : orderProducts) {
+                            Product match = null;
+
+                            for (Product available : storeProducts) {
+                                if (available.getProductName().equalsIgnoreCase(ordered.getProductName())) {
+                                    match = available;
+                                    break;
+                                }
+                            }
+
+                            if (match == null) {
+                                allAvailable = false;
+                                break;
+                            }
+
+                            if (match.getAvailableAmount() < ordered.getAvailableAmount()) {
+                                allAvailable = false;
+                                break;
+                            }
                         }
 
-                        System.out.println("📥 Αποθηκεύτηκε παραγγελία για το κατάστημα: " + store);
-                        Response okOrder = new Response(true, "Η παραγγελία καταχωρήθηκε", null);
-                        out.writeObject(okOrder);
+                        // Αν κάποιο προϊόν δεν έχει αρκετό απόθεμα, επιστρέφουμε μήνυμα αποτυχίας
+                        if (!allAvailable) {
+                            out.writeObject(new Response(false, "❌ Δεν υπάρχει επαρκές απόθεμα για την παραγγελία", null));
+                            out.flush();
+                            break;
+                        }
+
+                        // Επεξεργασία παραγγελίας - αφαίρεση ποσότητας και καταγραφή πωλήσεων
+                        for (Product ordered : orderProducts) {
+                            for (Product available : storeProducts) {
+                                if (available.getProductName().equalsIgnoreCase(ordered.getProductName())) {
+                                    int oldAmount = available.getAvailableAmount();
+                                    int newAmount = oldAmount - ordered.getAvailableAmount();
+                                    available.setAvailableAmount(newAmount);
+
+                                    // Καταγραφή πωλήσεων
+                                    String name = ordered.getProductName();
+                                    int sold = ordered.getAvailableAmount();
+                                    productSales.put(name, productSales.getOrDefault(name, 0) + sold);
+
+                                    System.out.println("🧾 Παραγγελία: " + sold + " x " + name + " (απόθεμα: " + oldAmount + " → " + newAmount + ")");
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Απάντηση επιτυχίας
+                        out.writeObject(new Response(true, "✅ Η παραγγελία καταχωρήθηκε επιτυχώς!", null));
                         out.flush();
                         break;
+
+
 
                     case "ADD_STORE":
                         Store store1 = (Store) request.getPayload();
