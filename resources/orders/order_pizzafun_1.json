@@ -1,0 +1,8 @@
+{
+  "storeName": "Pizza Fun",
+  "productsOrdered": {
+    "margarita": 2,
+    "salad": 1
+  },
+  "totalCost": 47.0
+}

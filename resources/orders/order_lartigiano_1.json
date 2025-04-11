@@ -1,0 +1,8 @@
+{
+  "storeName": "Lartigiano Pizza",
+  "productsOrdered": {
+    "margarita": 1,
+    "chef salad": 1
+  },
+  "totalCost": 14.0
+}

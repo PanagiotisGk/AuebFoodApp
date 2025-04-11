@@ -10,7 +10,9 @@ import common.model.UpdateProductRequest;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ClientHandler implements Runnable {
 
@@ -137,7 +139,31 @@ public class ClientHandler implements Runnable {
                             }
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα φιλτραρίσματος", filteredStores));
-                        break; 
+                        break;
+
+                    case "CATEGORY_REVENUE":
+                        List<WorkerConnection> workers = MasterServer.getWorkers();
+                        Map<String, Double> totalRevenue = new HashMap<>();
+
+                        for (WorkerConnection worker2 : workers) {
+                            worker2.sendRequest(request);
+                            Response workerResp = (Response) worker2.getInputStream().readObject();
+
+                            if (workerResp.isSuccess()) {
+                                Map<?, ?> rawMap = (Map<?, ?>) workerResp.getData();
+                                for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                                    if (entry.getKey() instanceof String && entry.getValue() instanceof Double) {
+                                        String category = (String) entry.getKey();
+                                        Double revenue = (Double) entry.getValue();
+                                        totalRevenue.put(category, totalRevenue.getOrDefault(category, 0.0) + revenue);
+                                    }
+                                }
+                            }
+                        }
+
+                        out.writeObject(new Response(true, "💰 Συγκεντρωτικά έσοδα ανά κατηγορία", totalRevenue));
+                        break;
+
                     default:
                         out.writeObject(new Response(false, "Άγνωστο αίτημα", null));
                         break;

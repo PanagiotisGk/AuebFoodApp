@@ -60,9 +60,6 @@ public class WorkerNode {
                         break;
 
 
-
-
-
                     case "GET_PRODUCTS":
                         String requestedStore = (String) request.getPayload();
                         System.out.println("🔍 Ζητήθηκε κατάστημα: '" + requestedStore + "'");
@@ -79,9 +76,6 @@ public class WorkerNode {
                         System.out.println("➡️ Πλήθος προϊόντων: " + (s.getProducts() != null ? s.getProducts().size() : "null"));
                         out.flush();
                         break;
-
-
-
 
 
                     case "UPDATE_PRODUCTS":
@@ -218,12 +212,10 @@ public class WorkerNode {
                         break;
 
 
-
                     case "ADD_ORDER":
                         Order order = (Order) request.getPayload();
                         String targetStore1 = order.getStoreName();
 
-                        // Ελέγχουμε αν το κατάστημα υπάρχει
                         if (!storeMap.containsKey(targetStore1)) {
                             out.writeObject(new Response(false, "❌ Το κατάστημα δεν υπάρχει", null));
                             out.flush();
@@ -231,64 +223,60 @@ public class WorkerNode {
                         }
 
                         Store store = storeMap.get(targetStore1);
-                        List<Product> orderProducts = order.getProducts();
                         List<Product> storeProducts = store.getProducts();
+                        Map<String, Integer> orderedProducts = order.getProductsOrdered();
 
-                        boolean allAvailable = true;
+                        // Έλεγχος διαθεσιμότητας
+                        for (Map.Entry<String, Integer> entry : orderedProducts.entrySet()) {
+                            String productName = entry.getKey();
+                            int quantityRequested = entry.getValue();
 
-                        // Έλεγχος διαθεσιμότητας προϊόντων
-                        for (Product ordered : orderProducts) {
-                            Product match = null;
+                            Product matchingProduct = storeProducts.stream()
+                                    .filter(p -> p.getProductName().equalsIgnoreCase(productName))
+                                    .findFirst()
+                                    .orElse(null);
 
-                            for (Product available : storeProducts) {
-                                if (available.getProductName().equalsIgnoreCase(ordered.getProductName())) {
-                                    match = available;
-                                    break;
-                                }
-                            }
-
-                            if (match == null) {
-                                allAvailable = false;
+                            if (matchingProduct == null) {
+                                out.writeObject(new Response(false, "❌ Το προϊόν '" + productName + "' δεν βρέθηκε στο κατάστημα", null));
+                                out.flush();
                                 break;
                             }
 
-                            if (match.getAvailableAmount() < ordered.getAvailableAmount()) {
-                                allAvailable = false;
+                            if (matchingProduct.getAvailableAmount() < quantityRequested) {
+                                out.writeObject(new Response(false, "❌ Δεν υπάρχει επαρκές απόθεμα για το προϊόν '" + productName + "'", null));
+                                out.flush();
                                 break;
                             }
                         }
 
-                        // Αν κάποιο προϊόν δεν έχει αρκετό απόθεμα, επιστρέφουμε μήνυμα αποτυχίας
-                        if (!allAvailable) {
-                            out.writeObject(new Response(false, "❌ Δεν υπάρχει επαρκές απόθεμα για την παραγγελία", null));
-                            out.flush();
-                            break;
-                        }
+                        // ✅ Εκτέλεση παραγγελίας: αφαίρεση ποσότητας, ενημέρωση εσόδων & καταγραφή
+                        synchronized (store) {
+                            for (Map.Entry<String, Integer> entry : orderedProducts.entrySet()) {
+                                String productName = entry.getKey();
+                                int quantity = entry.getValue();
 
-                        // Επεξεργασία παραγγελίας - αφαίρεση ποσότητας και καταγραφή πωλήσεων
-                        for (Product ordered : orderProducts) {
-                            for (Product available : storeProducts) {
-                                if (available.getProductName().equalsIgnoreCase(ordered.getProductName())) {
-                                    int oldAmount = available.getAvailableAmount();
-                                    int newAmount = oldAmount - ordered.getAvailableAmount();
-                                    available.setAvailableAmount(newAmount);
-
-                                    // Καταγραφή πωλήσεων
-                                    String name = ordered.getProductName();
-                                    int sold = ordered.getAvailableAmount();
-                                    productSales.put(name, productSales.getOrDefault(name, 0) + sold);
-
-                                    System.out.println("🧾 Παραγγελία: " + sold + " x " + name + " (απόθεμα: " + oldAmount + " → " + newAmount + ")");
-                                    break;
+                                for (Product p : storeProducts) {
+                                    if (p.getProductName().equalsIgnoreCase(productName)) {
+                                        int oldAmount = p.getAvailableAmount();
+                                        p.setAvailableAmount(oldAmount - quantity);
+                                        System.out.println("🧾 " + productName + ": -" + quantity + " (από " + oldAmount + " → " + p.getAvailableAmount() + ")");
+                                    }
                                 }
+
+                                // Ενημέρωση πωλήσεων ανά προϊόν (προαιρετικό)
+                                productSales.put(productName, productSales.getOrDefault(productName, 0) + quantity);
                             }
+
+                            // Ενημέρωση συνολικών εσόδων καταστήματος
+                            store.addRevenue(order.getTotalCost());
+
+                            // Καταγραφή παραγγελίας
+                            orderMap.computeIfAbsent(targetStore1, k -> new ArrayList<>()).add(order);
                         }
 
-                        // Απάντηση επιτυχίας
                         out.writeObject(new Response(true, "✅ Η παραγγελία καταχωρήθηκε επιτυχώς!", null));
                         out.flush();
                         break;
-
 
 
                     case "ADD_STORE":
@@ -313,7 +301,7 @@ public class WorkerNode {
                                 out.flush();
                                 break;
                             }
-                    
+
                             storeMap.put(storeName, store1);
                         }
 
@@ -331,8 +319,8 @@ public class WorkerNode {
 
                         for (Store store5km : storeMap.values()) {
                             double distance = distanceInKm(
-                                filtersFor5kmRange.getClientLatitude(),
-                                filtersFor5kmRange.getClientLongitude(),
+                                    filtersFor5kmRange.getClientLatitude(),
+                                    filtersFor5kmRange.getClientLongitude(),
                                     store5km.getLatitude(),
                                     store5km.getLongitude());
 
@@ -349,10 +337,10 @@ public class WorkerNode {
                         System.out.println("📩 Worker έλαβε αίτημα: FILTER_STORES");
                         SearchFilters filtersForStores = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = storeMap.values().stream()
-                            .filter(store2 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store2.getFoodCategory())))
-                            .filter(store2 -> store2.getStars() >= filtersForStores.getMinStars())
-                            .filter(store2 -> (filtersForStores.getPriceCategories() == null || filtersForStores.getPriceCategories().contains(store2.getPriceCategory())))
-                            .collect(Collectors.toList());
+                                .filter(store2 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store2.getFoodCategory())))
+                                .filter(store2 -> store2.getStars() >= filtersForStores.getMinStars())
+                                .filter(store2 -> (filtersForStores.getPriceCategories() == null || filtersForStores.getPriceCategories().contains(store2.getPriceCategory())))
+                                .collect(Collectors.toList());
 
                         System.out.println("📦 Αποτελέσματα φίλτρων: " + filteredStores.size());
                         System.out.println("📦 Αποτελέσματα φίλτρων: " + filteredStores);
@@ -360,14 +348,46 @@ public class WorkerNode {
                         out.writeObject(filterResponse);
                         out.flush();
                         break;
-                        
+
 
                     default:
                         Response error = new Response(false, "Άγνωστο αίτημα", null);
                         out.writeObject(error);
                         out.flush();
                         break;
+
+
+                    case "CATEGORY_REVENUE":
+                        Map<String, Double> categoryRevenue = new HashMap<>();
+
+                        for (Map.Entry<String, List<Order>> entry : orderMap.entrySet()) {
+                            String currentStoreName = entry.getKey(); // ✅ νέο όνομα
+                            List<Order> orders = entry.getValue();
+                            Store currentstore = storeMap.get(currentStoreName);
+
+                            if (currentstore == null) continue;
+
+                            String category = currentstore.getFoodCategory();
+                            double total = categoryRevenue.getOrDefault(category, 0.0);
+
+                            for (Order o : orders) {
+                                total += o.getTotalCost();
+                            }
+
+                            categoryRevenue.put(category, total);
+                        }
+                        System.out.println("📤 DEBUG CATEGORY_REVENUE:");
+                        System.out.println(" -> Πλήθος entries: " + categoryRevenue.size());
+                        categoryRevenue.forEach((cat, rev) ->
+                                System.out.printf(" - %s: %.2f€\n", cat, rev)
+                        );
+
+                        out.writeObject(new Response(true, "💰 Έσοδα ανά κατηγορία καταστήματος", categoryRevenue));
+                        out.flush();
+                        break;
+
                 }
+
             }
 
         } catch (IOException | ClassNotFoundException e) {
