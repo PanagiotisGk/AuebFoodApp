@@ -275,6 +275,14 @@ public class WorkerNode {
                         }
 
                         out.writeObject(new Response(true, "✅ Η παραγγελία καταχωρήθηκε επιτυχώς!", null));
+                        System.out.println("📥 Καταχώρηση παραγγελίας:");
+                        System.out.println(" - Κατάστημα: " + order.getStoreName());
+                        System.out.println(" - Προϊόντα: " + order.getProductsOrdered());
+                        System.out.println(" - Κόστος: " + order.getTotalCost());
+                        System.out.println("📥 Καταγραφή στο orderMap...");
+                        System.out.println("📦 Τρέχουσες παραγγελίες στο store:");
+                        orderMap.get(order.getStoreName()).forEach(o -> System.out.println(" - " + o));
+
                         out.flush();
                         break;
 
@@ -385,6 +393,65 @@ public class WorkerNode {
                         out.writeObject(new Response(true, "💰 Έσοδα ανά κατηγορία καταστήματος", categoryRevenue));
                         out.flush();
                         break;
+
+                    case "CATEGORY_PRODUCT_SALES":
+                        String categoryRequested = (String) request.getPayload();
+                        Map<String, Double> result = new HashMap<>();
+                        double totalRevenue = 0.0;
+
+                        for (Map.Entry<String, List<Order>> entry : orderMap.entrySet()) {
+                            String astoreName = entry.getKey();
+                            List<Order> orders = entry.getValue();
+                            Store astore = storeMap.get(astoreName);
+                            if (astore == null) continue;
+
+                            double storeRevenue = 0.0;
+
+                            System.out.println("🧪 DEBUG Πωλήσεις για κατηγορία: " + categoryRequested);
+                            System.out.println("🧪 Καταχώρηση προϊόντων παραγγελιών για Pizza Fun:");
+
+                            for (Order anorder : orders) {
+                                Map<String, Integer> ordered = anorder.getProductsOrdered();
+
+                                for (Map.Entry<String, Integer> prodEntry : ordered.entrySet()) {
+                                    String productName = prodEntry.getKey();
+                                    int quantity = prodEntry.getValue();
+
+                                    Product matched = astore.getProducts().stream()
+                                            .filter(p -> p.getProductName().equalsIgnoreCase(productName))
+                                            .findFirst()
+                                            .orElse(null);
+
+                                    if (matched != null) {
+                                        System.out.println("🧪 Βρέθηκε προϊόν: " + matched.getProductName() +
+                                                " (" + matched.getProductType() + "), ζητήθηκε: " + categoryRequested);
+
+                                        if (matched.getProductType() != null &&
+                                                matched.getProductType().equalsIgnoreCase(categoryRequested)) {
+
+                                            storeRevenue += quantity * matched.getPrice();
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            if (storeRevenue > 0.0) {
+                                result.put(astoreName, storeRevenue);
+                                totalRevenue += storeRevenue;
+                            }
+                        }
+
+                        result.put("total", totalRevenue);
+                        out.writeObject(new Response(true, "💰 Έσοδα ανά κατηγορία προϊόντος", result));
+
+                        System.out.println("💰 Έσοδα ανά κατάστημα:");
+                        result.forEach((astore, rev) -> System.out.println(" - " + astore + ": " + rev + "€"));
+                        out.flush();
+                        break;
+
+
+
 
                 }
 

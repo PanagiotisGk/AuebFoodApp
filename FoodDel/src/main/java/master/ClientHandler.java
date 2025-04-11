@@ -164,6 +164,38 @@ public class ClientHandler implements Runnable {
                         out.writeObject(new Response(true, "💰 Συγκεντρωτικά έσοδα ανά κατηγορία", totalRevenue));
                         break;
 
+                    case "CATEGORY_PRODUCT_SALES":
+                        String category = (String) request.getPayload();
+                        Map<String, Double> finalMap = new HashMap<>();
+                        double total = 0.0;
+
+                        for (WorkerConnection aworker : MasterServer.getWorkers()) {
+                            aworker.sendRequest(request);
+                            Response workerResp = (Response) aworker.getInputStream().readObject();
+
+                            if (workerResp.isSuccess()) {
+                                Map<?, ?> data = (Map<?, ?>) workerResp.getData();
+                                for (Map.Entry<?, ?> entry : data.entrySet()) {
+                                    if (entry.getKey() instanceof String && entry.getValue() instanceof Number) {
+                                        String astoreName = (String) entry.getKey();
+                                        double revenue = ((Number) entry.getValue()).doubleValue();
+
+                                        if (astoreName.equals("total")) {
+                                            total += revenue;
+                                        } else {
+                                            finalMap.put(astoreName, finalMap.getOrDefault(astoreName, 0.0) + revenue);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        finalMap.put("total", total);
+                        out.writeObject(new Response(true, "📊 Συγκεντρωτικά έσοδα κατηγορίας " + category, finalMap));
+                        break;
+
+
+
                     default:
                         out.writeObject(new Response(false, "Άγνωστο αίτημα", null));
                         break;

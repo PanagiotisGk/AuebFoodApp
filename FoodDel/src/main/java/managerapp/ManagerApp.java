@@ -243,11 +243,6 @@ public class ManagerApp {
                         Response revResp = (Response) in.readObject();
                         Object payloadRev = revResp.getData();
 
-                        // 🔍 DEBUG (σημαντικό!)
-                        System.out.println("📦 Payload class: " + (payloadRev != null ? payloadRev.getClass().getName() : "null"));
-                        System.out.println("📦 Payload content: " + payloadRev);
-
-
                         if (payloadRev instanceof Map<?, ?>) {
                            Map<String, Double> revenues = new HashMap<>();
                            Map<?, ?> raw = (Map<?, ?>) payloadRev;
@@ -269,6 +264,40 @@ public class ManagerApp {
                            System.out.println("❌ Το payload δεν ήταν έγκυρος πίνακας.");
                         }
                        break;
+
+
+                    case 7:
+                        System.out.print("Δώσε κατηγορία προϊόντος (π.χ. salad, pizza, coffee): ");
+                        String prodCategory = scanner.nextLine();
+
+                        Request reqCat = new Request("CATEGORY_PRODUCT_SALES", prodCategory);
+                        out.writeObject(reqCat);
+                        out.flush();
+
+                        Response respCat = (Response) in.readObject();
+                        Object apayload = respCat.getData();
+
+                        if (apayload instanceof Map<?, ?>) {
+                            Map<String, Double> revenueMap = new HashMap<>();
+                            Map<?, ?> raw = (Map<?, ?>) apayload;
+
+                            System.out.println("💰 Έσοδα προϊόντων κατηγορίας: " + prodCategory);
+                            for (Map.Entry<?, ?> entry : raw.entrySet()) {
+                                String store = (String) entry.getKey();
+                                double rev = ((Number) entry.getValue()).doubleValue();
+
+                                if (!store.equals("total")) {
+                                    System.out.printf(" - %s: %.2f€\n", store, rev);
+                                } else {
+                                    System.out.printf("Σύνολο: %.2f€\n", rev);
+                                }
+                            }
+
+                        } else {
+                            System.out.println("❌ Το αποτέλεσμα δεν ήταν έγκυρο.");
+                        }
+                        break;
+
 
                     case 0:
                         System.out.println("Έξοδος...");
