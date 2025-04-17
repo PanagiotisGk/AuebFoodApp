@@ -39,7 +39,7 @@ public class ManagerApp {
             while (true) {
                 System.out.println("\n===== MENU =====");
                 System.out.println("1. Καταχώρηση καταστημάτων ");
-                System.out.println("2. Καταχώρηση παραγγελίας (order.json)");
+                System.out.println("2. Καταχώρηση παραγγελίας");
                 System.out.println("3. Ενημέρωση προϊόντων καταστήματος (ADD / REMOVE / REDUCE)");
                 System.out.println("4. Προβολή προϊόντων καταστήματος");
                 System.out.println("5. Προβολή συνολικών πωλήσεων ανά προϊόν");
