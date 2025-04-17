@@ -51,11 +51,47 @@ public class WorkerNode {
                 switch (request.getType()) {
 
                     case "PRODUCT_SALES":
-                        if (productSales == null || productSales.isEmpty()) {
-                            out.writeObject(new Response(true, "📊 Καμία καταγεγραμμένη πώληση", new HashMap<String, Integer>()));
-                        } else {
-                            out.writeObject(new Response(true, "📊 Συνολικές πωλήσεις", productSales));
+                        Map<String, Map<String, Object>> productStats = new HashMap<>();
+
+                        for (Map.Entry<String, List<Order>> entry : orderMap.entrySet()) {
+                            String storeKey = entry.getKey();
+                            List<Order> orders = entry.getValue();
+                            Store storeObj = storeMap.get(storeKey);
+                            if (storeObj == null) continue;
+
+                            for (Order order : orders) {
+                                Map<String, Integer> ordered = order.getProductsOrdered();
+
+                                for (Map.Entry<String, Integer> e : ordered.entrySet()) {
+                                    String prodName = e.getKey();
+                                    int qty = e.getValue();
+
+                                    Product p = storeObj.getProducts().stream()
+                                            .filter(prod -> prod.getProductName().equalsIgnoreCase(prodName))
+                                            .findFirst()
+                                            .orElse(null);
+
+                                    if (p != null) {
+                                        double revenue = qty * p.getPrice();
+
+                                        if (!productStats.containsKey(prodName)) {
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("quantity", qty);
+                                            data.put("revenue", revenue);
+                                            productStats.put(prodName, data);
+                                        } else {
+                                            Map<String, Object> data = productStats.get(prodName);
+                                            int oldQty = (Integer) data.get("quantity");
+                                            double oldRev = (Double) data.get("revenue");
+                                            data.put("quantity", oldQty + qty);
+                                            data.put("revenue", oldRev + revenue);
+                                        }
+                                    }
+                                }
+                            }
                         }
+
+                        out.writeObject(new Response(true, "📊 Πωλήσεις προϊόντων", productStats));
                         out.flush();
                         break;
 
@@ -82,13 +118,12 @@ public class WorkerNode {
                         UpdateProductRequest upr = (UpdateProductRequest) request.getPayload();
                         String sName = upr.getStoreName();
 
-                        if (!storeMap.containsKey(sName)) {
+                        Store s1 = storeMap.get(sName);
+                        if (s1 == null) {
                             out.writeObject(new Response(false, "❌ Το κατάστημα δεν υπάρχει", null));
                             out.flush();
                             break;
                         }
-
-                        Store s1 = storeMap.get(sName);
 
                         if ("ADD".equalsIgnoreCase(upr.getAction())) {
                             boolean updated = false;
@@ -96,7 +131,7 @@ public class WorkerNode {
                             for (Product p : s1.getProducts()) {
                                 if (p.getProductName().equalsIgnoreCase(upr.getProductName())) {
 
-                                    // 🔢 Προσθήκη ποσότητας (αν > 0)
+                                    // 🔢 Προσθήκη ποσότητας
                                     if (upr.getAvailableAmount() > 0) {
                                         int prev = p.getAvailableAmount();
                                         int newAmount = prev + upr.getAvailableAmount();
@@ -104,13 +139,13 @@ public class WorkerNode {
                                         System.out.println("📦 Προστέθηκαν " + upr.getAvailableAmount() + " τεμάχια στο προϊόν '" + p.getProductName() + "'. Νέα ποσότητα: " + newAmount);
                                     }
 
-                                    // 💰 Αλλαγή τιμής
+                                    // 💰 Ενημέρωση τιμής
                                     if (upr.getPrice() > 0 && p.getPrice() != upr.getPrice()) {
                                         System.out.println("ℹ️ Ενημερώθηκε η τιμή προϊόντος '" + p.getProductName() + "' από " + p.getPrice() + "€ σε " + upr.getPrice() + "€");
                                         p.setPrice(upr.getPrice());
                                     }
 
-                                    // 🏷️ Αλλαγή τύπου
+                                    // 🏷️ Ενημέρωση τύπου
                                     if (upr.getProductType() != null && !upr.getProductType().equalsIgnoreCase("null") &&
                                             !p.getProductType().equalsIgnoreCase(upr.getProductType())) {
                                         System.out.println("ℹ️ Ενημερώθηκε ο τύπος προϊόντος '" + p.getProductName() + "' από " + p.getProductType() + " σε " + upr.getProductType());
@@ -122,12 +157,10 @@ public class WorkerNode {
                                 }
                             }
 
-
                             if (!updated) {
-                                // Για νέο προϊόν απαιτούνται όλα τα πεδία
                                 if (upr.getAvailableAmount() <= 0 || upr.getPrice() <= 0 ||
                                         upr.getProductType() == null || upr.getProductType().equalsIgnoreCase("null")) {
-                                    out.writeObject(new Response(false, "❌ Για νέα προϊόντα απαιτείται θετική ποσότητα, τιμή και έγκυρος τύπος", null));
+                                    out.writeObject(new Response(false, "❌ Για νέο προϊόν απαιτείται θετική ποσότητα, τιμή και τύπος", null));
                                 } else {
                                     Product newProd = new Product(
                                             upr.getProductName(),
@@ -150,6 +183,45 @@ public class WorkerNode {
                             } else {
                                 System.out.println("⚠️ Το προϊόν '" + upr.getProductName() + "' δεν βρέθηκε στο κατάστημα '" + s1.getStoreName() + "'");
                                 out.writeObject(new Response(false, "❌ Το προϊόν δεν βρέθηκε", null));
+                            }
+
+                        } else if ("REDUCE".equalsIgnoreCase(upr.getAction())) {
+                            List<Product> products = s1.getProducts();
+                            boolean found = false;
+
+                            for (Product p : products) {
+                                if (p.getProductName().equalsIgnoreCase(upr.getProductName())) {
+                                    int currentAmount = p.getAvailableAmount();
+                                    int reduceBy = upr.getAvailableAmount();
+
+                                    if (reduceBy <= 0) {
+                                        out.writeObject(new Response(false, "❌ Η ποσότητα προς αφαίρεση πρέπει να είναι θετική", null));
+                                        out.flush();
+                                        break;
+                                    }
+
+                                    if (reduceBy > currentAmount) {
+                                        out.writeObject(new Response(false,
+                                                "❌ Δεν μπορεί να αφαιρεθεί ποσότητα μεγαλύτερη από το απόθεμα (" + currentAmount + " διαθέσιμα)", null));
+                                        out.flush();
+                                        break;
+                                    }
+
+                                    p.setAvailableAmount(currentAmount - reduceBy);
+
+                                    System.out.printf("🔽 Μειώθηκε ποσότητα για %s: -%d (από %d → %d)\n",
+                                            p.getProductName(), reduceBy, currentAmount, p.getAvailableAmount());
+
+                                    out.writeObject(new Response(true, "✅ Η ποσότητα μειώθηκε επιτυχώς", null));
+                                    out.flush();
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                out.writeObject(new Response(false, "❌ Το προϊόν δεν βρέθηκε στο κατάστημα", null));
+                                out.flush();
                             }
                         }
 

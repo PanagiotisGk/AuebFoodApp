@@ -120,7 +120,7 @@ public class ManagerApp {
                         System.out.print("Όνομα προϊόντος: ");
                         String productName = scanner.nextLine();
 
-                        System.out.print("Ενέργεια (ADD / REMOVE): ");
+                        System.out.print("Ενέργεια (ADD / REMOVE / REDUCE): ");
                         String action = scanner.nextLine().toUpperCase();
 
                         String productType = "unknown";
@@ -137,11 +137,15 @@ public class ManagerApp {
 
                             System.out.print("Τιμή προϊόντος (ή -1 για καμία αλλαγή): ");
                             price = Double.parseDouble(scanner.nextLine().trim());
+                        } else if ("REDUCE".equals(action)) {
+                            System.out.print("Ποσότητα προς αφαίρεση: ");
+                            quantity = Integer.parseInt(scanner.nextLine().trim());
                         }
 
                         UpdateProductRequest upr = new UpdateProductRequest(
                                 storeName, productName, productType, quantity, price, action
                         );
+
                         Request req = new Request("UPDATE_PRODUCTS", upr);
                         out.writeObject(req);
                         out.flush();
@@ -152,87 +156,99 @@ public class ManagerApp {
 
 
                     case 4:
-
                         if (addedStores.isEmpty()) {
                             System.out.println("⚠️ Δεν υπάρχουν καταχωρημένα καταστήματα.");
                             break;
                         }
 
                         System.out.println("📋 Καταχωρημένα καταστήματα:");
-                        for (String store : addedStores) {
-                            System.out.println(" - " + store);
+                        for (String storeKey : addedStores) {
+                            System.out.println(" - " + storeKey);
                         }
-                        System.out.print("Όνομα καταστήματος: ");
-                        String storeName1 = scanner.nextLine();
 
-                        Request getProductsReq = new Request("GET_PRODUCTS", storeName1);
+                        System.out.print("📦 Δώσε όνομα καταστήματος (π.χ. Pizza Fun): ");
+                        String storeKey = scanner.nextLine().trim();
+
+                        Request getProductsReq = new Request("GET_PRODUCTS", storeKey);
                         out.writeObject(getProductsReq);
                         out.flush();
 
                         Response productResp = (Response) in.readObject();
-                        Object payload = productResp.getPayload();
-
+                        Object payload = productResp.getData(); // ✅ χρησιμοποιούμε getData()
 
                         if (productResp.isSuccess()) {
                             if (payload instanceof List<?>) {
-                                List<?> rawList = (List<?>) payload;
-                                List<Product> prods = new ArrayList<>();
-                                for (Object o : rawList) {
+                                List<Product> products = new ArrayList<>();
+                                for (Object o : (List<?>) payload) {
                                     if (o instanceof Product) {
-                                        prods.add((Product) o);
+                                        products.add((Product) o);
                                     }
                                 }
 
-                                if (prods.isEmpty()) {
-                                    System.out.println("⚠️ Το κατάστημα δεν έχει καταχωρημένα προϊόντα.");
+                                if (products.isEmpty()) {
+                                    System.out.println("⚠️ Το κατάστημα δεν έχει προϊόντα.");
                                 } else {
-                                    System.out.println("Προϊόντα καταστήματος " + storeName1 + ":");
-                                    for (Product p : prods) {
-                                        System.out.println(" - " + p);
+                                    System.out.println("📋 Προϊόντα καταστήματος " + storeKey + ":");
+                                    for (Product p : products) {
+                                        System.out.printf(" - %s (%s) - %.2f€, Διαθέσιμα: %d\n",
+                                                p.getProductName(), p.getProductType(), p.getPrice(), p.getAvailableAmount());
                                     }
                                 }
+
                             } else {
-                                System.out.println("📋 Διαθέσιμα τα προϊόντα του καταστήματος " + storeName1);
+                                System.out.println("⚠️ Το payload δεν ήταν λίστα προϊόντων.");
                             }
+
                         } else {
                             System.out.println("❌ " + productResp.getMessage());
                         }
+
                         break;
 
                     case 5:
-                        Request salesReq = new Request("PRODUCT_SALES", null);
-                        out.writeObject(salesReq);
+                        Request req1 = new Request("PRODUCT_SALES", null);
+                        out.writeObject(req1);
                         out.flush();
 
-                        Response salesResp = (Response) in.readObject();
+                        Response resp1 = (Response) in.readObject();
+                        Object Prodpayload = resp1.getData();
 
-                        Object payload1 = salesResp.getPayload();
+                        if (Prodpayload instanceof Map<?, ?> rawMap) {
+                            Map<String, Integer> qtyMap = new HashMap<>();
+                            Map<String, Double> revMap = new HashMap<>();
 
-                        if (payload1 instanceof Map<?, ?>) {
-                            Map<?, ?> rawMap = (Map<?, ?>) payload1;
+                            System.out.println("📊 Πωλήσεις ανά προϊόν:");
 
-                            // Δημιουργούμε νέο Map με σωστά generics
-                            Map<String, Integer> sales = new HashMap<>();
                             for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
-                                if (entry.getKey() instanceof String && entry.getValue() instanceof Integer) {
-                                    sales.put((String) entry.getKey(), (Integer) entry.getValue());
+                                String product = (String) entry.getKey();
+                                Object value = entry.getValue();
+
+                                if (value instanceof Map<?, ?> dataMap) {
+                                    Integer qty = ((Number) dataMap.get("quantity")).intValue();
+                                    Double rev = ((Number) dataMap.get("revenue")).doubleValue();
+
+                                    qtyMap.put(product, qty);
+                                    revMap.put(product, rev);
                                 }
                             }
 
-                            if (sales.isEmpty()) {
-                                System.out.println("⚠️ Δεν υπάρχουν ακόμα καταγεγραμμένες πωλήσεις.");
+                            if (qtyMap.isEmpty()) {
+                                System.out.println("⚠️ Δεν υπάρχουν καταγεγραμμένες πωλήσεις.");
                             } else {
-                                System.out.println("📊 Συνολικές Πωλήσεις ανά προϊόν:");
-                                sales.entrySet().stream()
-                                        .sorted(Map.Entry.comparingByKey())
-                                        .forEach(entry -> System.out.println(" - " + entry.getKey() + ": " + entry.getValue() + " πωλήσεις"));
-
+                                qtyMap.keySet().stream()
+                                        .sorted()
+                                        .forEach(prod -> {
+                                            int qty = qtyMap.get(prod);
+                                            double rev = revMap.getOrDefault(prod, 0.0);
+                                            System.out.printf(" - %s: %d τεμάχια / %.2f€\n", prod, qty, rev);
+                                        });
                             }
 
                         } else {
-                            System.out.println("❌ Το payload των πωλήσεων δεν ήταν έγκυρος πίνακας.");
+                            System.out.println("❌ Το αποτέλεσμα δεν ήταν έγκυρο.");
+                            System.out.println("📦 Payload class: " + (Prodpayload != null ? Prodpayload.getClass().getName() : "null"));
+                            System.out.println("📦 Περιεχόμενο: " + Prodpayload);
                         }
-
                         break;
 
                     case 6:

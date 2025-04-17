@@ -194,6 +194,42 @@ public class ClientHandler implements Runnable {
                         out.writeObject(new Response(true, "📊 Συγκεντρωτικά έσοδα κατηγορίας " + category, finalMap));
                         break;
 
+                    case "PRODUCT_SALES":
+                        Map<String, Map<String, Object>> totalSales = new HashMap<>();
+
+                        for (WorkerConnection Prodworker : MasterServer.getWorkers()) {
+                            Prodworker.sendRequest(request);
+                            Response workerResp = (Response) Prodworker.getInputStream().readObject();
+
+                            if (workerResp.isSuccess()) {
+                                Map<?, ?> data = (Map<?, ?>) workerResp.getData();
+
+                                for (Map.Entry<?, ?> entry : data.entrySet()) {
+                                    String product = (String) entry.getKey();
+                                    Map<?, ?> values = (Map<?, ?>) entry.getValue();
+
+                                    int qty = ((Number) values.get("quantity")).intValue();
+                                    double rev = ((Number) values.get("revenue")).doubleValue();
+
+                                    if (!totalSales.containsKey(product)) {
+                                        Map<String, Object> stats = new HashMap<>();
+                                        stats.put("quantity", qty);
+                                        stats.put("revenue", rev);
+                                        totalSales.put(product, stats);
+                                    } else {
+                                        Map<String, Object> stats = totalSales.get(product);
+                                        int q = (Integer) stats.get("quantity");
+                                        double r = (Double) stats.get("revenue");
+                                        stats.put("quantity", q + qty);
+                                        stats.put("revenue", r + rev);
+                                    }
+                                }
+                            }
+                        }
+
+                        out.writeObject(new Response(true, "📊 Πωλήσεις ανά προϊόν", totalSales));
+                        break;
+
 
 
                     default:
