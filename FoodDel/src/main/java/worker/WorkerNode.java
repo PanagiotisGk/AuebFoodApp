@@ -413,6 +413,9 @@ public class WorkerNode {
                             List<Product> products = target.getProducts();
                             Map<String, Integer> ordered = order.getProductsOrdered();
 
+                            System.out.println("🧪 Ποσότητες πριν την παραγγελία:");
+                            products.forEach(p -> System.out.println(p.getProductName() + " → " + p.getAvailableAmount()));
+
                             boolean invalid = false;
                             for (Map.Entry<String, Integer> entry : ordered.entrySet()) {
                                 String productName = entry.getKey();
@@ -440,7 +443,11 @@ public class WorkerNode {
                                             .filter(p -> p.getProductName().equalsIgnoreCase(productName))
                                             .findFirst().get();
 
-                                    product.setAvailableAmount(product.getAvailableAmount() - quantity);
+                                    int before = product.getAvailableAmount();
+                                    product.setAvailableAmount(before - quantity);
+
+                                    System.out.printf("📉 Αφαιρώ %d από '%s' → %d → %d\n", quantity, productName, before, product.getAvailableAmount());
+
                                     productSales.put(productName, productSales.getOrDefault(productName, 0) + quantity);
                                 }
 
@@ -448,9 +455,13 @@ public class WorkerNode {
                                 orderMap.computeIfAbsent(targetStore, k -> new ArrayList<>()).add(order);
                             }
 
+                            System.out.println("🧪 Ποσότητες ΜΕΤΑ την παραγγελία:");
+                            products.forEach(p -> System.out.println(p.getProductName() + " → " + p.getAvailableAmount()));
+
                             out.writeObject(new Response(true, "✅ Η παραγγελία καταχωρήθηκε", null));
                             out.flush();
                             break;
+
 
                     }
                 } catch (Exception ex) {
