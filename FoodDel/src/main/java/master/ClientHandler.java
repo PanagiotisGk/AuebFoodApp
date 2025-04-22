@@ -9,10 +9,7 @@ import common.model.UpdateProductRequest;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClientHandler implements Runnable {
 
@@ -32,19 +29,27 @@ public class ClientHandler implements Runnable {
             out.flush();
             in = new ObjectInputStream(socket.getInputStream());
 
-            Request request = (Request) in.readObject();
-            System.out.println("📩 Λήφθηκε request τύπου: " + request.getType());
+            Request firstRequest = (Request) in.readObject();
+            System.out.println("📩 Λήφθηκε request τύπου: " + firstRequest.getType());
 
-            if ("REGISTER_WORKER".equals(request.getType())) {
-                WorkerConnection worker = new WorkerConnection(socket, out, in);
+            if ("REGISTER_WORKER".equals(firstRequest.getType())) {
+                String workerId = "Worker-" + MasterServer.getNextWorkerId();
+
+                WorkerConnection worker = new WorkerConnection(socket, out, in, workerId);
                 MasterServer.addWorker(worker);
-                System.out.println("📍 Worker καταχωρήθηκε επιτυχώς.");
-                // 🚫 Μην κάνεις return με try-with-resources — γιατί θα κλείσει socket!
+
+                System.out.println("📍 Νέος Worker καταχωρήθηκε με ID: " + workerId);
+                out.writeObject(new Response(true, "Εγγραφή επιτυχής", workerId));
+                out.flush();
                 return;
+
             }
+
+            // Από εδώ και κάτω διαχείριση για Manager ή άλλους clients
+            Request request = firstRequest;
+
             while (true) {
                 switch (request.getType()) {
-
                     case "GET_PRODUCTS":
                         String storeName = (String) request.getPayload();
                         WorkerConnection worker = MasterServer.getWorkerForStore(storeName);
@@ -52,24 +57,18 @@ public class ClientHandler implements Runnable {
                             out.writeObject(new Response(false, "❌ Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
-
                         worker.sendRequest(request);
                         Response resp = (Response) worker.getInputStream().readObject();
-                        System.out.println("⬅️ Worker Response: success=" + resp.isSuccess() + ", data=" + resp.getData());
                         out.writeObject(resp);
                         break;
 
-
                     case "ADD_ORDER":
                         Order order = (Order) request.getPayload();
-                        System.out.println("📦 Παραγγελία προς: " + order.getStoreName());
-
                         WorkerConnection worker1 = MasterServer.getWorkerForStore(order.getStoreName());
                         if (worker1 == null) {
                             out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
-
                         worker1.sendRequest(request);
                         Response orderResp = (Response) worker1.getInputStream().readObject();
                         out.writeObject(orderResp);
@@ -82,85 +81,65 @@ public class ClientHandler implements Runnable {
                             out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
-
                         chosenWorker.sendRequest(request);
                         Response updateResp = (Response) chosenWorker.getInputStream().readObject();
                         out.writeObject(updateResp);
                         break;
 
-
-
                     case "ADD_STORE":
                         Object payload = request.getPayload();
-
                         if (payload instanceof List<?>) {
-                            // Αν το payload είναι λίστα, κάνουμε cast σε List<Store>
                             List<?> storesList = (List<?>) payload;
                             for (Object obj : storesList) {
                                 if (obj instanceof Store) {
                                     processStore((Store) obj, out);
-                                } else {
-                                    System.err.println("❌ Σφάλμα: Αντικείμενο στη λίστα δεν είναι Store!");
                                 }
                             }
                         } else if (payload instanceof Store) {
-                            // Αν το payload είναι μεμονωμένο Store
                             processStore((Store) payload, out);
-                        } else {
-                            System.err.println("❌ Σφάλμα: Άγνωστος τύπος δεδομένων στο ADD_STORE request!");
                         }
                         break;
+
                     case "SEARCH_5KM_RANGE":
                         SearchFilters filters = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearch5kmRange = new ArrayList<>();
-                    
-                        for (WorkerConnection worker2 : MasterServer.getWorkers()) {
-                            worker2.sendRequest(request);
-                            Response workerResponse = (Response) worker2.getInputStream().readObject();
-                    
-                            if (workerResponse.isSuccess()) {
-                                List<Store> partial = (List<Store>) workerResponse.getData();
-                                resultsForSearch5kmRange.addAll(partial);
+                        for (WorkerConnection w : MasterServer.getWorkers()) {
+                            w.sendRequest(request);
+                            Response workerResp = (Response) w.getInputStream().readObject();
+                            if (workerResp.isSuccess()) {
+                                resultsForSearch5kmRange.addAll((List<Store>) workerResp.getData());
                             }
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα κοντινών καταστημάτων", resultsForSearch5kmRange));
                         break;
-                    case "FILTER_STORES":                 
+
+                    case "FILTER_STORES":
                         SearchFilters filterCriteria = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = new ArrayList<>();
-                    
-                        for (WorkerConnection worker2 : MasterServer.getWorkers()) {
-                            worker2.sendRequest(request);
-                            Response workerResponse = (Response) worker2.getInputStream().readObject();
-                    
-                            if (workerResponse.isSuccess()) {
-                                List<Store> partialResults = (List<Store>) workerResponse.getData();
-                                filteredStores.addAll(partialResults);
+                        for (WorkerConnection w : MasterServer.getWorkers()) {
+                            w.sendRequest(request);
+                            Response workerResp = (Response) w.getInputStream().readObject();
+                            if (workerResp.isSuccess()) {
+                                filteredStores.addAll((List<Store>) workerResp.getData());
                             }
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα φιλτραρίσματος", filteredStores));
                         break;
 
                     case "CATEGORY_REVENUE":
-                        List<WorkerConnection> workers = MasterServer.getWorkers();
                         Map<String, Double> totalRevenue = new HashMap<>();
-
-                        for (WorkerConnection worker2 : workers) {
-                            worker2.sendRequest(request);
-                            Response workerResp = (Response) worker2.getInputStream().readObject();
-
+                        for (WorkerConnection w : MasterServer.getWorkers()) {
+                            w.sendRequest(request);
+                            Response workerResp = (Response) w.getInputStream().readObject();
                             if (workerResp.isSuccess()) {
                                 Map<?, ?> rawMap = (Map<?, ?>) workerResp.getData();
                                 for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
-                                    if (entry.getKey() instanceof String && entry.getValue() instanceof Double) {
-                                        String category = (String) entry.getKey();
-                                        Double revenue = (Double) entry.getValue();
-                                        totalRevenue.put(category, totalRevenue.getOrDefault(category, 0.0) + revenue);
-                                    }
+                                    String category = (String) entry.getKey();
+                                    Double revenue = ((Number) entry.getValue()).doubleValue();
+                                    totalRevenue.put(category, totalRevenue.getOrDefault(category, 0.0) + revenue);
                                 }
                             }
                         }
-
                         out.writeObject(new Response(true, "💰 Συγκεντρωτικά έσοδα ανά κατηγορία", totalRevenue));
                         break;
 
@@ -168,69 +147,43 @@ public class ClientHandler implements Runnable {
                         String category = (String) request.getPayload();
                         Map<String, Double> finalMap = new HashMap<>();
                         double total = 0.0;
-
-                        for (WorkerConnection aworker : MasterServer.getWorkers()) {
-                            aworker.sendRequest(request);
-                            Response workerResp = (Response) aworker.getInputStream().readObject();
-
+                        for (WorkerConnection w : MasterServer.getWorkers()) {
+                            w.sendRequest(request);
+                            Response workerResp = (Response) w.getInputStream().readObject();
                             if (workerResp.isSuccess()) {
                                 Map<?, ?> data = (Map<?, ?>) workerResp.getData();
                                 for (Map.Entry<?, ?> entry : data.entrySet()) {
-                                    if (entry.getKey() instanceof String && entry.getValue() instanceof Number) {
-                                        String astoreName = (String) entry.getKey();
-                                        double revenue = ((Number) entry.getValue()).doubleValue();
-
-                                        if (astoreName.equals("total")) {
-                                            total += revenue;
-                                        } else {
-                                            finalMap.put(astoreName, finalMap.getOrDefault(astoreName, 0.0) + revenue);
-                                        }
-                                    }
+                                    String name = (String) entry.getKey();
+                                    double revenue = ((Number) entry.getValue()).doubleValue();
+                                    if (name.equals("total")) total += revenue;
+                                    else finalMap.put(name, finalMap.getOrDefault(name, 0.0) + revenue);
                                 }
                             }
                         }
-
                         finalMap.put("total", total);
                         out.writeObject(new Response(true, "📊 Συγκεντρωτικά έσοδα κατηγορίας " + category, finalMap));
                         break;
 
                     case "PRODUCT_SALES":
                         Map<String, Map<String, Object>> totalSales = new HashMap<>();
-
-                        for (WorkerConnection Prodworker : MasterServer.getWorkers()) {
-                            Prodworker.sendRequest(request);
-                            Response workerResp = (Response) Prodworker.getInputStream().readObject();
-
+                        for (WorkerConnection w : MasterServer.getWorkers()) {
+                            w.sendRequest(request);
+                            Response workerResp = (Response) w.getInputStream().readObject();
                             if (workerResp.isSuccess()) {
                                 Map<?, ?> data = (Map<?, ?>) workerResp.getData();
-
                                 for (Map.Entry<?, ?> entry : data.entrySet()) {
                                     String product = (String) entry.getKey();
                                     Map<?, ?> values = (Map<?, ?>) entry.getValue();
-
                                     int qty = ((Number) values.get("quantity")).intValue();
                                     double rev = ((Number) values.get("revenue")).doubleValue();
-
-                                    if (!totalSales.containsKey(product)) {
-                                        Map<String, Object> stats = new HashMap<>();
-                                        stats.put("quantity", qty);
-                                        stats.put("revenue", rev);
-                                        totalSales.put(product, stats);
-                                    } else {
-                                        Map<String, Object> stats = totalSales.get(product);
-                                        int q = (Integer) stats.get("quantity");
-                                        double r = (Double) stats.get("revenue");
-                                        stats.put("quantity", q + qty);
-                                        stats.put("revenue", r + rev);
-                                    }
+                                    Map<String, Object> stats = totalSales.computeIfAbsent(product, k -> new HashMap<>());
+                                    stats.put("quantity", (int) stats.getOrDefault("quantity", 0) + qty);
+                                    stats.put("revenue", (double) stats.getOrDefault("revenue", 0.0) + rev);
                                 }
                             }
                         }
-
                         out.writeObject(new Response(true, "📊 Πωλήσεις ανά προϊόν", totalSales));
                         break;
-
-
 
                     default:
                         out.writeObject(new Response(false, "Άγνωστο αίτημα", null));
@@ -245,24 +198,31 @@ public class ClientHandler implements Runnable {
             System.out.println("🧨 ClientHandler τελείωσε και έκλεισε socket: " + socket);
         }
     }
+
     private void processStore(Store store, ObjectOutputStream out) throws IOException {
         System.out.println("📦 Επεξεργασία store: " + store.getStoreName());
 
-        WorkerConnection chosenWorker = MasterServer.getWorkerForStore(store.getStoreName());
+        WorkerConnection chosenWorker = MasterServer.getNextWorker();
+
         if (chosenWorker == null) {
             out.writeObject(new Response(false, "❗ Δεν υπάρχει διαθέσιμος Worker", null));
             return;
         }
 
+        // ✅ Στείλε το κατάστημα στον Worker
         chosenWorker.sendRequest(new Request("ADD_STORE", store));
-        Response workerResp;
-        try {
-            workerResp = (Response) chosenWorker.getInputStream().readObject();
-        } catch (ClassNotFoundException e) {
-            workerResp = new Response(false, "❌ Σφάλμα κατά την ανάγνωση της απάντησης του Worker", null);
-        }
 
-        out.writeObject(workerResp);
+        // ✅ Καταχώρισε ποιος Worker έχει αυτό το store
+        MasterServer.registerStoreForWorker(store.getStoreName(), chosenWorker);
+
+        System.out.println("📦 Κατάστημα '" + store.getStoreName() + "' ανατέθηκε στον Worker: " + chosenWorker.getWorkerId());
+
+        try {
+            Response workerResp = (Response) chosenWorker.getInputStream().readObject();
+            out.writeObject(workerResp);
+        } catch (ClassNotFoundException e) {
+            out.writeObject(new Response(false, "❌ Σφάλμα κατά την ανάγνωση της απάντησης του Worker", null));
+        }
     }
 
 }

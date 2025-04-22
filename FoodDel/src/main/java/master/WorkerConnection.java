@@ -11,17 +11,23 @@ public class WorkerConnection {
     private final Socket socket;
     private final ObjectOutputStream out;
     private final ObjectInputStream in;
+    private final String workerId;
 
-    public WorkerConnection(Socket socket, ObjectOutputStream out, ObjectInputStream in) {
+    public WorkerConnection(Socket socket, ObjectOutputStream out, ObjectInputStream in,String workerId) {
         this.socket = socket;
         this.out = out;
         this.in = in;
+        this.workerId = workerId;
     }
 
     public void sendRequest(Request request) throws IOException {
         System.out.println("📤 Στέλνω στον Worker: " + request.getType());
         out.writeObject(request);
         out.flush();
+    }
+
+    public String getWorkerId() {
+        return workerId;
     }
 
     public ObjectInputStream getInputStream() {
