@@ -21,7 +21,7 @@ public class WorkerConnection {
     }
 
     public void sendRequest(Request request) throws IOException {
-        System.out.println("📤 Στέλνω στον Worker: " + request.getType());
+        System.out.println(" Στέλνω στον Worker: " + request.getType());
         out.writeObject(request);
         out.flush();
     }

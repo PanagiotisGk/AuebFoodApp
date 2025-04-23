@@ -5,18 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Product implements Serializable {
     private String productName;
-    @JsonProperty("productType") // 👈 το βάζεις εδώ
+    @JsonProperty("productType")
     private String productType;
     private int availableAmount;
     private double price;
 
-    // ✅ Default constructor (για Jackson)
+    //  Default constructor (για Jackson)
     public Product() {
     }
 
-
-
-    // ✅ Full constructor (για σένα)
+    //  Constructor 
     public Product(String productName, String productType, int availableAmount, double price) {
         this.productName = productName;
         this.productType = productType;

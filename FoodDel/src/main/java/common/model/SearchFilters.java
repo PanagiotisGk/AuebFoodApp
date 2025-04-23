@@ -6,9 +6,9 @@ import java.util.List;
 public class SearchFilters implements Serializable {
     private double clientLatitude;
     private double clientLongitude;
-    private List<String> foodCategories; // Π.χ. ["pizzeria", "souvlaki"]
-    private int minStars; // π.χ. 3
-    private List<String> priceCategories; // Π.χ. ["$", "$$"]
+    private List<String> foodCategories; // ["pizzeria", "souvlaki"]
+    private int minStars; // 3 , 4 κτλ
+    private List<String> priceCategories; // ["$", "$$"]
 
     public SearchFilters(double clientLatitude, double clientLongitude,
                          List<String> foodCategories, int minStars, List<String> priceCategories) {

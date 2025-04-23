@@ -10,7 +10,7 @@ public class Order implements Serializable {
     private double totalCost;
     private List<Product> productList;
 
-    // 🟢 Default constructor (για Jackson)
+    // Default constructor (για Jackson)
     public Order() {
     }
 

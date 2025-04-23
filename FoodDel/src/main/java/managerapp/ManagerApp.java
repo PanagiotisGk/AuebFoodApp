@@ -54,34 +54,34 @@ public class ManagerApp {
                     case 1:
 
                         while (true) {
-                            printAvailableStores("resources/stores", addedStores);
+                            printAvailableStores("resources/stores/", addedStores);
 
-                            System.out.print("📍 Δώσε το όνομα του καταστήματος τύπου Pizza_Fun (ή 'τέλος' για έξοδο): ");
+                            System.out.print(" Δώσε το όνομα του καταστήματος τύπου Pizza_Fun (ή 'τέλος' για έξοδο): ");
                             String storeName = scanner.nextLine().trim();
 
                             if (storeName.equalsIgnoreCase("τέλος") || storeName.equalsIgnoreCase("τελος")) break;
 
                             if (addedStores.contains(storeName)) {
-                                System.out.println("⚠️ Το κατάστημα '" + storeName + "' έχει ήδη προστεθεί.");
+                                System.out.println(" Το κατάστημα '" + storeName + "' έχει ήδη προστεθεί.");
                                 continue;
                             }
 
                             String storeFilePath = "resources/stores/" + storeName + ".json";
-                            System.out.println("📂 Διαβάζω από αρχείο: " + storeFilePath);
+                            System.out.println(" Διαβάζω από αρχείο: " + storeFilePath);
 
                             Store store = readStoreFromJson(storeFilePath);
                             if (store == null) {
-                                System.out.println("❌ Δεν βρέθηκε το αρχείο ή είχε σφάλμα.");
+                                System.out.println(" Δεν βρέθηκε το αρχείο ή είχε σφάλμα.");
                                 continue;
                             }
 
-                            System.out.println("📦 Κατάστημα διαβάστηκε: " + store);
+                            System.out.println(" Κατάστημα διαβάστηκε: " + store);
                             Request reqStore = new Request("ADD_STORE", store);
                             out.writeObject(reqStore);
                             out.flush();
 
                             Response resp = (Response) in.readObject();
-                            System.out.println("📥 Απάντηση: " + resp.getMessage());
+                            System.out.println(" Απάντηση: " + resp.getMessage());
 
                             addedStores.add(storeName);
                             Thread.sleep(100);
@@ -93,7 +93,7 @@ public class ManagerApp {
 
                         printAvailableOrders("resources/orders/");
 
-                        System.out.print("📦 Δώσε όνομα παραγγελίας (χωρίς .json): ");
+                        System.out.print(" Δώσε όνομα παραγγελίας (χωρίς .json): ");
                         String orderName = scanner.nextLine().trim();
 
                         String orderPath = "resources/orders/" + orderName + ".json";
@@ -107,7 +107,7 @@ public class ManagerApp {
                         out.flush();
 
                         Response resp2 = (Response) in.readObject();
-                        System.out.println("✅ Επιστροφή στο μενού μετά την παραγγελία");
+                        System.out.println(" Επιστροφή στο μενού μετά την παραγγελία");
 
                         System.out.println("Απάντηση: " + resp2.getMessage());
 
@@ -157,16 +157,16 @@ public class ManagerApp {
 
                     case 4:
                         if (addedStores.isEmpty()) {
-                            System.out.println("⚠️ Δεν υπάρχουν καταχωρημένα καταστήματα.");
+                            System.out.println(" Δεν υπάρχουν καταχωρημένα καταστήματα.");
                             break;
                         }
 
-                        System.out.println("📋 Καταχωρημένα καταστήματα:");
+                        System.out.println(" Καταχωρημένα καταστήματα:");
                         for (String storeKey : addedStores) {
                             System.out.println(" - " + storeKey);
                         }
 
-                        System.out.print("📦 Δώσε όνομα καταστήματος (π.χ. Pizza Fun): ");
+                        System.out.print(" Δώσε όνομα καταστήματος (π.χ. Pizza Fun): ");
                         String storeKey = scanner.nextLine().trim();
 
                         Request getProductsReq = new Request("GET_PRODUCTS", storeKey);
@@ -174,7 +174,7 @@ public class ManagerApp {
                         out.flush();
 
                         Response productResp = (Response) in.readObject();
-                        Object payload = productResp.getData(); // ✅ χρησιμοποιούμε getData()
+                        Object payload = productResp.getData(); //  χρησιμοποιούμε getData()
 
                         if (productResp.isSuccess()) {
                             if (payload instanceof List<?>) {
@@ -186,9 +186,9 @@ public class ManagerApp {
                                 }
 
                                 if (products.isEmpty()) {
-                                    System.out.println("⚠️ Το κατάστημα δεν έχει προϊόντα.");
+                                    System.out.println(" Το κατάστημα δεν έχει προϊόντα.");
                                 } else {
-                                    System.out.println("📋 Προϊόντα καταστήματος " + storeKey + ":");
+                                    System.out.println(" Προϊόντα καταστήματος " + storeKey + ":");
                                     for (Product p : products) {
                                         System.out.printf(" - %s (%s) - %.2f€, Διαθέσιμα: %d\n",
                                                 p.getProductName(), p.getProductType(), p.getPrice(), p.getAvailableAmount());
@@ -196,11 +196,11 @@ public class ManagerApp {
                                 }
 
                             } else {
-                                System.out.println("⚠️ Το payload δεν ήταν λίστα προϊόντων.");
+                                System.out.println(" Το payload δεν ήταν λίστα προϊόντων.");
                             }
 
                         } else {
-                            System.out.println("❌ " + productResp.getMessage());
+                            System.out.println(productResp.getMessage());
                         }
 
                         break;
@@ -217,7 +217,7 @@ public class ManagerApp {
                             Map<String, Integer> qtyMap = new HashMap<>();
                             Map<String, Double> revMap = new HashMap<>();
 
-                            System.out.println("📊 Πωλήσεις ανά προϊόν:");
+                            System.out.println(" Πωλήσεις ανά προϊόν:");
 
                             for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
                                 String product = (String) entry.getKey();
@@ -233,7 +233,7 @@ public class ManagerApp {
                             }
 
                             if (qtyMap.isEmpty()) {
-                                System.out.println("⚠️ Δεν υπάρχουν καταγεγραμμένες πωλήσεις.");
+                                System.out.println(" Δεν υπάρχουν καταγεγραμμένες πωλήσεις.");
                             } else {
                                 qtyMap.keySet().stream()
                                         .sorted()
@@ -245,9 +245,9 @@ public class ManagerApp {
                             }
 
                         } else {
-                            System.out.println("❌ Το αποτέλεσμα δεν ήταν έγκυρο.");
-                            System.out.println("📦 Payload class: " + (Prodpayload != null ? Prodpayload.getClass().getName() : "null"));
-                            System.out.println("📦 Περιεχόμενο: " + Prodpayload);
+                            System.out.println(" Το αποτέλεσμα δεν ήταν έγκυρο.");
+                            System.out.println(" Payload class: " + (Prodpayload != null ? Prodpayload.getClass().getName() : "null"));
+                            System.out.println(" Περιεχόμενο: " + Prodpayload);
                         }
                         break;
 
@@ -270,14 +270,14 @@ public class ManagerApp {
                             }
 
                             if (revenues.isEmpty()) {
-                                System.out.println("⚠️ Δεν υπάρχουν ακόμα καταχωρημένα έσοδα.");
+                                System.out.println(" Δεν υπάρχουν ακόμα καταχωρημένα έσοδα.");
                             } else {
-                                System.out.println("💰 Έσοδα ανά τύπο καταστήματος:");
+                                System.out.println(" Έσοδα ανά τύπο καταστήματος:");
                                revenues.forEach((cat, total) ->
                                     System.out.printf(" - %s: %.2f€\n", cat, total));
                            }
                         } else {
-                           System.out.println("❌ Το payload δεν ήταν έγκυρος πίνακας.");
+                           System.out.println(" Το payload δεν ήταν έγκυρος πίνακας.");
                         }
                        break;
 
@@ -297,7 +297,7 @@ public class ManagerApp {
                             Map<String, Double> revenueMap = new HashMap<>();
                             Map<?, ?> raw = (Map<?, ?>) apayload;
 
-                            System.out.println("💰 Έσοδα προϊόντων κατηγορίας: " + prodCategory);
+                            System.out.println(" Έσοδα προϊόντων κατηγορίας: " + prodCategory);
                             for (Map.Entry<?, ?> entry : raw.entrySet()) {
                                 String store = (String) entry.getKey();
                                 double rev = ((Number) entry.getValue()).doubleValue();
@@ -310,7 +310,7 @@ public class ManagerApp {
                             }
 
                         } else {
-                            System.out.println("❌ Το αποτέλεσμα δεν ήταν έγκυρο.");
+                            System.out.println(" Το αποτέλεσμα δεν ήταν έγκυρο.");
                         }
                         break;
 
@@ -320,52 +320,52 @@ public class ManagerApp {
                         return;
 
                     default:
-                        System.out.println("❌ Μη έγκυρη επιλογή");
+                        System.out.println(" Μη έγκυρη επιλογή");
                 }
             }
 
         } catch (IOException | ClassNotFoundException | InterruptedException e) {
-            System.err.println("❌ Σφάλμα στο Manager: " + e.getMessage());
+            System.err.println(" Σφάλμα στο Manager: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
+    // Εισαγωγή καταστημάτων από το αντίστοιχο json αρχείο
     private static Store readStoreFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(new File(filename), Store.class);
         } catch (IOException e) {
-            System.err.println("❌ Σφάλμα ανάγνωσης store.json: " + e.getMessage());
+            System.err.println(" Σφάλμα ανάγνωσης store.json: " + e.getMessage());
             return null;
         }
     }
-
+    // Εισαγωγή παραγγελίας από το αντίστοιχο json αρχείο
     private static Order readOrderFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(new File(filename), Order.class);
         } catch (IOException e) {
-            System.err.println("❌ Σφάλμα ανάγνωσης order.json: " + e.getMessage());
+            System.err.println(" Σφάλμα ανάγνωσης order.json: " + e.getMessage());
             return null;
         }
     }
-
+    // Εμφάνιση διαθέσιμων καταστημάτων για εισαγωγή
     private static void printAvailableStores(String folderPath, List<String> exclude) {
         File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
-            System.out.println("❌ Ο φάκελος δεν υπάρχει ή δεν είναι φάκελος.");
+            System.out.println(" Ο φάκελος δεν υπάρχει ή δεν είναι φάκελος.");
             return;
         }
 
         File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
         if (files == null || files.length == 0) {
-            System.out.println("⚠️ Δεν βρέθηκαν διαθέσιμα καταστήματα στο φάκελο.");
+            System.out.println(" Δεν βρέθηκαν διαθέσιμα καταστήματα στο φάκελο.");
             return;
         }
 
-        System.out.println("📋 Διαθέσιμα καταστήματα για εισαγωγή:");
+        System.out.println(" Διαθέσιμα καταστήματα για εισαγωγή:");
 
         for (File file : files) {
             String fileName = file.getName().replace(".json", "");
@@ -374,23 +374,23 @@ public class ManagerApp {
             }
         }
     }
-
+    // Εμφάνιση διαθέσιμων παραγγελιών για καταχώρηση
     private static void printAvailableOrders(String folderPath) {
         File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
-            System.out.println("❌ Ο φάκελος παραγγελιών δεν υπάρχει ή δεν είναι φάκελος.");
+            System.out.println(" Ο φάκελος παραγγελιών δεν υπάρχει ή δεν είναι φάκελος.");
             return;
         }
 
         File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
         if (files == null || files.length == 0) {
-            System.out.println("⚠️ Δεν βρέθηκαν διαθέσιμες παραγγελίες στο φάκελο.");
+            System.out.println(" Δεν βρέθηκαν διαθέσιμες παραγγελίες στο φάκελο.");
             return;
         }
 
-        System.out.println("📋 Διαθέσιμες παραγγελίες:");
+        System.out.println(" Διαθέσιμες παραγγελίες:");
         for (File file : files) {
             String fileName = file.getName().replace(".json", "");
             System.out.println("  - " + fileName);

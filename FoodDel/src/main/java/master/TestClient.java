@@ -16,7 +16,7 @@ import java.util.List;
 public class TestClient {
 
     public static void main(String[] args) {
-        String serverAddress = "localhost"; // ή IP αν τρέχει αλλού
+        String serverAddress = "localhost"; // IP στην οποία τρέχει ο MasterServer
         int port = 5000;
 
         try (
@@ -24,18 +24,19 @@ public class TestClient {
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
-            System.out.println("🔵 Συνδέθηκα με τον Master Server!");
+            System.out.println(" Συνδέθηκα με τον Master Server!");
 
-            // Δημιουργία dummy request
+            // ---------- Δημιουργία dummy request ------------
             Request pingRequest = new Request("PING", null);
             out.writeObject(pingRequest);
-            System.out.println("📤 Έστειλα request: " + pingRequest.getType());
+            System.out.println(" Έστειλα request: " + pingRequest.getType());
 
             // Λήψη response
             Response response = (Response) in.readObject();
-            System.out.println("📥 Λήφθηκε απάντηση: " + response.getMessage());
+            System.out.println(" Λήφθηκε απάντηση: " + response.getMessage());
+            // Τέλος dummy request
 
-            // Find stores in 5km range from customer
+            // ------------- Εύρεση Καταστημάτων σε απόσταση 5km από τον Πελάτη ----------------
             SearchFilters filtersFor5kmRange = new SearchFilters(37.9755, 23.7348, null, 0, null);
             Request searchRequest5km = new Request("SEARCH_5KM_RANGE", filtersFor5kmRange);
             out.writeObject(searchRequest5km);
@@ -44,25 +45,26 @@ public class TestClient {
             Response response5km = (Response) in.readObject();
             List<Store> stores = (List<Store>) response5km.getData();
             if (stores.isEmpty()) {
-                System.out.println("🔍 Δεν βρέθηκαν κοντινά καταστήματα σε ακτίνα 5km.");
+                System.out.println(" Δεν βρέθηκαν κοντινά καταστήματα σε ακτίνα 5km.");
             } else {
-                System.out.println("📍 Κοντινά Καταστήματα (σε ακτίνα 5km):\n");
+                System.out.println(" Κοντινά Καταστήματα (σε ακτίνα 5km):\n");
                 stores.sort(Comparator.comparingDouble(Store::getStars).reversed());
                 int i = 1;
                 for (Store store : stores) {
                     System.out.println(i + ". " + store.getStoreName() + "  " + store.getStoreLogo());
-                    System.out.println("   🍕 Κατηγορία: " + store.getFoodCategory());
-                    System.out.println("   ⭐ Βαθμολογία: " + store.getStars() + "★\n");
+                    System.out.println("    Κατηγορία: " + store.getFoodCategory());
+                    System.out.println("    Βαθμολογία: " + store.getStars() + "\n");
                     i++;
                 }
             }
+            // ------------- Τέος Εύρεσης Καταστημάτων σε απόσταση 5km από τον Πελάτη ----------------
 
-            // Εύρεση καταστημάτων με βάση τα φίλτρα
+            // ------------- Εύρεση καταστημάτων με βάση τα φίλτρα (Απόσταση, Τύπος Καταστήματος, Ακρίβεια Καταστήματος) -------------
             SearchFilters filtersForStores = new SearchFilters(
                 37.9755, 23.7348, 
-                List.of("pizzeria"), // Θέλουμε μόνο pizza και sushi
-                3,                         // Μόνο μαγαζιά με τουλάχιστον 4★
-                List.of("$$", "$$$")       // Μόνο $$ ή $$$ καταστήματα
+                List.of("pizzeria"), 
+                3,                         
+                List.of("$$", "$$$") 
             );
 
             Request filterRequest = new Request("FILTER_STORES", filtersForStores);
@@ -73,21 +75,22 @@ public class TestClient {
             List<Store> filteredStores = (List<Store>) filterResponse.getData();
 
             if (filteredStores.isEmpty()) {
-                System.out.println("❌ Δεν βρέθηκαν καταστήματα που να ταιριάζουν στα φίλτρα.");
+                System.out.println(" Δεν βρέθηκαν καταστήματα που να ταιριάζουν στα φίλτρα.");
             } else {
-                System.out.println("✅ Βρέθηκαν " + filteredStores.size() + " καταστήματα με βάση τα φίλτρα σας:");
+                System.out.println(" Βρέθηκαν " + filteredStores.size() + " καταστήματα με βάση τα φίλτρα σας:");
                 int i = 1;
                 for (Store store : filteredStores) {
                     System.out.println(i + ". " + store.getStoreName());
-                    System.out.println("   🍔 Κατηγορία: " + store.getFoodCategory());
-                    System.out.println("   ⭐ Βαθμολογία: " + store.getStars() + "★");
-                    System.out.println("   💰 Τιμή: " + store.getPriceCategory());
+                    System.out.println("    Κατηγορία: " + store.getFoodCategory());
+                    System.out.println("    Βαθμολογία: " + store.getStars() );
+                    System.out.println("    Τιμή: " + store.getPriceCategory());
                     i++;
                 }
             }
+            // ------------- Τέλος Εύρεσης καταστημάτων με βάση τα φίλτρα -------------
             
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("❌ Σφάλμα στον Test Client: " + e.getMessage());
+            System.err.println(" Σφάλμα στον Test Client: " + e.getMessage());
         }
     }
 }

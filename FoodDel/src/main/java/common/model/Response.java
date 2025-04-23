@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Response implements Serializable {
     private boolean success;
     private String message;
-    private Object data; // Προαιρετικά: λίστα καταστημάτων, αποτελέσματα αναζήτησης κλπ.
+    private Object data; // λίστα καταστημάτων, αποτελέσματα αναζήτησης κλπ.
 
     public Response(boolean success, String message, Object data) {
         this.success = success;

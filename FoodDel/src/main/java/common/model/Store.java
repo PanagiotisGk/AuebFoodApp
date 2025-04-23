@@ -34,6 +34,7 @@ public class Store implements Serializable {
         calculatePriceCategory();
     }
 
+    // Συνάρτηση για την προσθήκη προϊόντων σε ένα καταστημα
     public void addProduct(String name, double price) {
         products.add(new Product(name, "unknown", 1, price));
         calculatePriceCategory();
@@ -47,6 +48,7 @@ public class Store implements Serializable {
         return removed;
     }
 
+    // Συνάρτηση για τον υπολογισμό της ακρίβειας του καταστήματος
     private void calculatePriceCategory() {
         if (products == null || products.isEmpty()) {
             priceCategory = "$";

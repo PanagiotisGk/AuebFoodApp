@@ -25,51 +25,59 @@ public class MasterServer {
 
 
     public static void main(String[] args) {
-        System.out.println("🟢 Master Server ξεκίνησε στη θύρα " + PORT);
+        System.out.println(" Master Server ξεκίνησε στη θύρα " + PORT);
         int workerCounter = 1;
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("🔗 Νέα σύνδεση από: " + socket.getInetAddress());
+                System.out.println(" Νέα σύνδεση από: " + socket.getInetAddress());
 
                 new Thread(new ClientHandler(socket)).start();
 
 
             }
         } catch (IOException e) {
-            System.err.println("❌ Σφάλμα στον Master Server: " + e.getMessage());
+            System.err.println(" Σφάλμα στον Master Server: " + e.getMessage());
         }
     }
 
+    // Βοηθητικές συναρτήσεις για τους workers
 
+    // Προσθήκη καινούργιου worker
     public static void addWorker(WorkerConnection worker) {
         workers.add(worker);
-        System.out.println("🧱 Νέος Worker καταχωρήθηκε. Σύνολο Workers: " + workers.size());
+        System.out.println(" Νέος Worker καταχωρήθηκε. Σύνολο Workers: " + workers.size());
     }
 
+    // Εύρεση του worker που περιέχει το κατάστημα που ψάχνουμε
     public static WorkerConnection getWorkerForStore(String storeName) {
         return storeToWorkerMap.get(storeName);
     }
 
 
-
+    // Εμφάνιση όλων των workers
     public static List<WorkerConnection> getWorkers() {
         return workers;
     }
 
+    // Προσθήκη id στον worker
     public static synchronized int getNextWorkerId() {
         return workerCounter++;
     }
 
+    // 
     public static void registerStoreForWorker(String storeName, WorkerConnection worker) {
         storeToWorkerMap.put(storeName, worker);
     }
+
+    // Εύρεση διαθέσιμου worker, εάν υπάρχει
     public static WorkerConnection getAnyAvailableWorker() {
         if (workers.isEmpty()) return null;
         return workers.get(0); // ή Random, ή round-robin
     }
 
+    // 
     public static synchronized WorkerConnection getNextWorker() {
         if (workers.isEmpty()) return null;
 
