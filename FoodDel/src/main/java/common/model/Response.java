@@ -3,6 +3,10 @@ package common.model;
 import java.io.Serializable;
 
 public class Response implements Serializable {
+
+    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    private static final long serialVersionUID = 1L;
+
     private boolean success;
     private String message;
     private Object data; // λίστα καταστημάτων, αποτελέσματα αναζήτησης κλπ.

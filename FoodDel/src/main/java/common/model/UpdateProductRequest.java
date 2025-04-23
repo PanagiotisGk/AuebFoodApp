@@ -3,6 +3,10 @@ package common.model;
 import java.io.Serializable;
 
 public class UpdateProductRequest implements Serializable {
+
+    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    private static final long serialVersionUID = 1L;
+
     private String storeName;
     private String productName;
     private String productType;

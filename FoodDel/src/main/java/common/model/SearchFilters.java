@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 public class SearchFilters implements Serializable {
+
+    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    private static final long serialVersionUID = 1L;
+
     private double clientLatitude;
     private double clientLongitude;
     private List<String> foodCategories; // ["pizzeria", "souvlaki"]

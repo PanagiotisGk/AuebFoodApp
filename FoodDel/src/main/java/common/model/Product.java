@@ -4,6 +4,10 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Product implements Serializable {
+    
+    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    private static final long serialVersionUID = 1L;
+    
     private String productName;
     @JsonProperty("productType")
     private String productType;

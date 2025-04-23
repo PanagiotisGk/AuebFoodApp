@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Store implements Serializable {
+
+    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    private static final long serialVersionUID = 1L;
+
     private String storeName;
     private double latitude;
     private double longitude;

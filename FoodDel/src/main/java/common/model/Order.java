@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.List;
 
 public class Order implements Serializable {
+
+    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    private static final long serialVersionUID = 1L;
+
     private String storeName;
     private Map<String, Integer> productsOrdered;
     private double totalCost;
