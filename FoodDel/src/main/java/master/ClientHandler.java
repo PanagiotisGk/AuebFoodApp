@@ -100,6 +100,19 @@ public class ClientHandler implements Runnable {
                             processStore((Store) payload, out);
                         }
                         break;
+                    // Εύρεση όλων των καταχωρημένων καταστημάτων 
+                    case "SEARCH_ALL_STORES":
+                        SearchFilters filtersAllStores = (SearchFilters) request.getPayload();
+                        List<Store> resultsForSearchAllStores = new ArrayList<>();
+                        for (WorkerConnection w : MasterServer.getWorkers()) {
+                            w.sendRequest(request);
+                            Response workerResp = (Response) w.getInputStream().readObject();
+                            if (workerResp.isSuccess()) {
+                                resultsForSearchAllStores.addAll((List<Store>) workerResp.getData());
+                            }
+                        }
+                        out.writeObject(new Response(true, "Αποτελέσματα όλων των καταχωρημένων καταστημάτων", resultsForSearchAllStores));
+                        break;
                     // Εύρεση καταστημάτων σε ακτίνα 5χλμ
                     case "SEARCH_5KM_RANGE":
                         SearchFilters filters = (SearchFilters) request.getPayload();
