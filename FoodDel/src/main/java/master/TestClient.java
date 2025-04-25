@@ -2,6 +2,7 @@ package master;
 
 import common.model.Request;
 import common.model.Response;
+import common.model.Product;
 // import common.model.SearchFilters;
 // import common.model.Store;
 import common.model.SearchFilters;
@@ -36,6 +37,35 @@ public class TestClient {
             System.out.println(" Λήφθηκε απάντηση: " + response.getMessage());
             // Τέλος dummy request
 
+            // ------------- Εύρεση όλων των Καταχωρημένων Καταστημάτων ----------------
+            SearchFilters filtersForAllStores = new SearchFilters(37.9755, 23.7348, null, 0, null);
+            Request searchRequestForAllStores = new Request("SEARCH_ALL_STORES", filtersForAllStores);
+            out.writeObject(searchRequestForAllStores);
+
+            // Λήψη response
+            Response responseAllStores = (Response) in.readObject();
+            List<Store> allStores = (List<Store>) responseAllStores.getData();
+            if (allStores.isEmpty()) {
+                System.out.println(" \n ---------- Δεν βρέθηκαν καταχωρημένα καταστήματα ----------");
+            } else {
+                System.out.println(" \n ---------- Καταχωρημένα Καταστήματα ----------");
+                allStores.sort(Comparator.comparingDouble(Store::getStars).reversed());
+                int i = 1;
+                for (Store store : allStores) {
+                    System.out.println("\n" + i + ". " + store.getStoreName() + "  " + store.getStoreLogo());
+                    System.out.println("    Κατηγορία: " + store.getFoodCategory());
+                    System.out.println("    Βαθμολογία: " + store.getStars() );
+                    System.out.println("  Διαθέσιμα Προϊόντα :");
+                    int j = 1;
+                    for (Product product : store.getProducts()){
+                        System.out.println("    " + j +": " + product );
+                        j++;
+                    }
+                    i++;
+                }
+            }
+            // ------------- Τέος Εύρεσης Καταστημάτων σε απόσταση 5km από τον Πελάτη ----------------
+
             // ------------- Εύρεση Καταστημάτων σε απόσταση 5km από τον Πελάτη ----------------
             SearchFilters filtersFor5kmRange = new SearchFilters(37.9755, 23.7348, null, 0, null);
             Request searchRequest5km = new Request("SEARCH_5KM_RANGE", filtersFor5kmRange);
@@ -45,15 +75,21 @@ public class TestClient {
             Response response5km = (Response) in.readObject();
             List<Store> stores = (List<Store>) response5km.getData();
             if (stores.isEmpty()) {
-                System.out.println(" Δεν βρέθηκαν κοντινά καταστήματα σε ακτίνα 5km.");
+                System.out.println(" \n ---------- Δεν βρέθηκαν κοντινά καταστήματα σε ακτίνα 5km. ----------");
             } else {
-                System.out.println(" Κοντινά Καταστήματα (σε ακτίνα 5km):\n");
+                System.out.println(" \n ---------- Κοντινά Καταστήματα (σε ακτίνα 5km) ----------");
                 stores.sort(Comparator.comparingDouble(Store::getStars).reversed());
                 int i = 1;
                 for (Store store : stores) {
-                    System.out.println(i + ". " + store.getStoreName() + "  " + store.getStoreLogo());
+                    System.out.println("\n" + i + ". " + store.getStoreName() + "  " + store.getStoreLogo());
                     System.out.println("    Κατηγορία: " + store.getFoodCategory());
-                    System.out.println("    Βαθμολογία: " + store.getStars() + "\n");
+                    System.out.println("    Βαθμολογία: " + store.getStars() );
+                    System.out.println("  Διαθέσιμα Προϊόντα : ");
+                    int j = 1;
+                    for (Product product : store.getProducts()){
+                        System.out.println("    " + j +": " + product );
+                        j++;
+                    }
                     i++;
                 }
             }
@@ -75,9 +111,9 @@ public class TestClient {
             List<Store> filteredStores = (List<Store>) filterResponse.getData();
 
             if (filteredStores.isEmpty()) {
-                System.out.println(" Δεν βρέθηκαν καταστήματα που να ταιριάζουν στα φίλτρα.");
+                System.out.println(" ----------Δεν βρέθηκαν καταστήματα που να ταιριάζουν στα φίλτρα. ----------");
             } else {
-                System.out.println(" Βρέθηκαν " + filteredStores.size() + " καταστήματα με βάση τα φίλτρα σας:");
+                System.out.println("\n Βρέθηκαν " + filteredStores.size() + " καταστήματα με βάση τα φίλτρα σας: \n");
                 int i = 1;
                 for (Store store : filteredStores) {
                     System.out.println(i + ". " + store.getStoreName());
