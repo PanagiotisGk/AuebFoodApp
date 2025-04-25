@@ -70,6 +70,20 @@ public class WorkerNode {
                             out.flush();
                             break;
 
+                        case "SEARCH_ALL_STORES":
+                            SearchFilters filtersForAllStores = (SearchFilters) request.getPayload();
+                            List<Store> allRegisterStores = new ArrayList<>();
+
+                            for (Store allstores : storeMap.values()) {      
+                                        allRegisterStores.add(allstores);
+                                }
+                            
+                            System.out.println(" Αποτελέσματα Search για όλα τα καταχωρημένα καταστήματα: " + allRegisterStores.size());
+                            Response responseForAllStores = new Response(true, " Όλα τα καταχωρημένα Καταστήματα ", allRegisterStores);
+                            out.writeObject(responseForAllStores);
+                            out.flush();
+                            break;
+
                         case "SEARCH_5KM_RANGE":
                             SearchFilters filtersFor5kmRange = (SearchFilters) request.getPayload();
                             List<Store> nearbyStores = new ArrayList<>();
