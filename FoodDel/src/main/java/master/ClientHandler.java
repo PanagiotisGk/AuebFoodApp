@@ -30,7 +30,7 @@ public class ClientHandler implements Runnable {
             in = new ObjectInputStream(socket.getInputStream());
 
             Request firstRequest = (Request) in.readObject();
-            System.out.println(" Λήφθηκε request τύπου: " + firstRequest.getType());
+            System.out.println("Λήφθηκε request τύπου: " + firstRequest.getType());
 
             if ("REGISTER_WORKER".equals(firstRequest.getType())) {
                 String workerId = "Worker-" + MasterServer.getNextWorkerId();
@@ -38,7 +38,7 @@ public class ClientHandler implements Runnable {
                 WorkerConnection worker = new WorkerConnection(socket, out, in, workerId);
                 MasterServer.addWorker(worker);
 
-                System.out.println(" Νέος Worker καταχωρήθηκε με ID: " + workerId);
+                System.out.println("Νέος Worker καταχωρήθηκε με ID: " + workerId);
                 out.writeObject(new Response(true, "Εγγραφή επιτυχής", workerId));
                 out.flush();
                 return;
@@ -55,7 +55,7 @@ public class ClientHandler implements Runnable {
                         String storeName = (String) request.getPayload();
                         WorkerConnection worker = MasterServer.getWorkerForStore(storeName);
                         if (worker == null) {
-                            out.writeObject(new Response(false, " Δεν υπάρχει διαθέσιμος Worker", null));
+                            out.writeObject(new Response(false, "Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
                         worker.sendRequest(request);
@@ -67,7 +67,7 @@ public class ClientHandler implements Runnable {
                         Order order = (Order) request.getPayload();
                         WorkerConnection worker1 = MasterServer.getWorkerForStore(order.getStoreName());
                         if (worker1 == null) {
-                            out.writeObject(new Response(false, " Δεν υπάρχει διαθέσιμος Worker", null));
+                            out.writeObject(new Response(false, "Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
                         worker1.sendRequest(request);
@@ -79,7 +79,7 @@ public class ClientHandler implements Runnable {
                         String storeName1 = ((UpdateProductRequest) request.getPayload()).getStoreName();
                         WorkerConnection chosenWorker = MasterServer.getWorkerForStore(storeName1);
                         if (chosenWorker == null) {
-                            out.writeObject(new Response(false, " Δεν υπάρχει διαθέσιμος Worker", null));
+                            out.writeObject(new Response(false, "Δεν υπάρχει διαθέσιμος Worker", null));
                             break;
                         }
                         chosenWorker.sendRequest(request);

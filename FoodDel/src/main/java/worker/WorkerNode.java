@@ -15,7 +15,7 @@ public class WorkerNode {
 
     public void start(String masterHost, int masterPort) {
         try {
-            System.out.println("\uD83D\uDD0C Σύνδεση με τον Master στο " + masterHost + ":" + masterPort + " ...");
+            System.out.println("Σύνδεση με τον Master στο " + masterHost + ":" + masterPort + " ...");
 
             Socket socket = new Socket(masterHost, masterPort);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -28,13 +28,13 @@ public class WorkerNode {
             Response resp = (Response) in.readObject();
             String workerId = (String) resp.getData();
 
-            System.out.println("\uD83D\uDFE2 Συνδέθηκα με τον Master στη θύρα " + masterPort);
-            System.out.println("\uD83D\uDCE1 Δήλωσα τον εαυτό μου ως Worker στον Master");
-            System.out.println("\uD83D\uDC77 [" + workerId + "] Έτοιμος για αιτήματα.");
+            System.out.println("Συνδέθηκα με τον Master στη θύρα " + masterPort);
+            System.out.println("Δήλωσα τον εαυτό μου ως Worker στον Master");
+            System.out.println("[" + workerId + "] Έτοιμος για αιτήματα.");
 
             while (true) {
                 try {
-                    System.out.println(" Περιμένω νέο request...");
+                    System.out.println("Περιμένω νέο request...");
                     Request request = (Request) in.readObject();
                     System.out.println(" [" + workerId + "] Νέο αίτημα: " + request.getType());
 
@@ -60,7 +60,7 @@ public class WorkerNode {
 
                                 categoryRevenue.put(category, total);
                             }
-                            System.out.println(" DEBUG CATEGORY_REVENUE:");
+                            System.out.println("DEBUG CATEGORY_REVENUE:");
                             System.out.println(" -> Πλήθος entries: " + categoryRevenue.size());
                             categoryRevenue.forEach((cat, rev) ->
                                     System.out.printf(" - %s: %.2f€\n", cat, rev)
@@ -78,7 +78,7 @@ public class WorkerNode {
                                         allRegisterStores.add(allstores);
                                 }
                             
-                            System.out.println(" Αποτελέσματα Search για όλα τα καταχωρημένα καταστήματα: " + allRegisterStores.size());
+                            System.out.println("Αποτελέσματα Search για όλα τα καταχωρημένα καταστήματα: " + allRegisterStores.size());
                             Response responseForAllStores = new Response(true, " Όλα τα καταχωρημένα Καταστήματα ", allRegisterStores);
                             out.writeObject(responseForAllStores);
                             out.flush();
@@ -99,14 +99,14 @@ public class WorkerNode {
                                     nearbyStores.add(store5km);
                                 }
                             }
-                            System.out.println(" Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
+                            System.out.println("Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
                             Response response = new Response(true, "Καταστήματα σε ακτίνα 5km", nearbyStores);
                             out.writeObject(response);
                             out.flush();
                             break;
 
                         case "FILTER_STORES":
-                            System.out.println(" Worker έλαβε αίτημα: FILTER_STORES");
+                            System.out.println("Worker έλαβε αίτημα: FILTER_STORES");
                             SearchFilters filtersForStores = (SearchFilters) request.getPayload();
                             List<Store> filteredStores = storeMap.values().stream()
                                     .filter(store2 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store2.getFoodCategory())))
@@ -114,8 +114,8 @@ public class WorkerNode {
                                     .filter(store2 -> (filtersForStores.getPriceCategories() == null || filtersForStores.getPriceCategories().contains(store2.getPriceCategory())))
                                     .collect(Collectors.toList());
 
-                            System.out.println(" Αποτελέσματα φίλτρων: " + filteredStores.size());
-                            System.out.println(" Αποτελέσματα φίλτρων: " + filteredStores);
+                            System.out.println("Αποτελέσματα φίλτρων: " + filteredStores.size());
+                            System.out.println("Αποτελέσματα φίλτρων: " + filteredStores);
                             Response filterResponse = new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores);
                             out.writeObject(filterResponse);
                             out.flush();
@@ -188,7 +188,7 @@ public class WorkerNode {
 
                             Store s1 = storeMap.get(sName);
                             if (s1 == null) {
-                                out.writeObject(new Response(false, " Το κατάστημα δεν υπάρχει", null));
+                                out.writeObject(new Response(false, "Το κατάστημα δεν υπάρχει", null));
                                 out.flush();
                                 break;
                             }
@@ -204,19 +204,19 @@ public class WorkerNode {
                                             int prev = p.getAvailableAmount();
                                             int newAmount = prev + upr.getAvailableAmount();
                                             p.setAvailableAmount(newAmount);
-                                            System.out.println(" Προστέθηκαν " + upr.getAvailableAmount() + " τεμάχια στο προϊόν '" + p.getProductName() + "'. Νέα ποσότητα: " + newAmount);
+                                            System.out.println("Προστέθηκαν " + upr.getAvailableAmount() + " τεμάχια στο προϊόν '" + p.getProductName() + "'. Νέα ποσότητα: " + newAmount);
                                         }
 
                                         //  Ενημέρωση τιμής
                                         if (upr.getPrice() > 0 && p.getPrice() != upr.getPrice()) {
-                                            System.out.println("ℹ️ Ενημερώθηκε η τιμή προϊόντος '" + p.getProductName() + "' από " + p.getPrice() + "€ σε " + upr.getPrice() + "€");
+                                            System.out.println("Ενημερώθηκε η τιμή προϊόντος '" + p.getProductName() + "' από " + p.getPrice() + "€ σε " + upr.getPrice() + "€");
                                             p.setPrice(upr.getPrice());
                                         }
 
                                         //  Ενημέρωση τύπου
                                         if (upr.getProductType() != null && !upr.getProductType().equalsIgnoreCase("null") &&
                                                 !p.getProductType().equalsIgnoreCase(upr.getProductType())) {
-                                            System.out.println("ℹ️ Ενημερώθηκε ο τύπος προϊόντος '" + p.getProductName() + "' από " + p.getProductType() + " σε " + upr.getProductType());
+                                            System.out.println("Ενημερώθηκε ο τύπος προϊόντος '" + p.getProductName() + "' από " + p.getProductType() + " σε " + upr.getProductType());
                                             p.setProductType(upr.getProductType());
                                         }
 
@@ -237,20 +237,20 @@ public class WorkerNode {
                                                 upr.getPrice()
                                         );
                                         s1.getProducts().add(newProd);
-                                        out.writeObject(new Response(true, " Προστέθηκε νέο προϊόν", null));
+                                        out.writeObject(new Response(true, "Προστέθηκε νέο προϊόν", null));
                                     }
                                 } else {
-                                    out.writeObject(new Response(true, " Ενημερώθηκε το προϊόν", null));
+                                    out.writeObject(new Response(true, "Ενημερώθηκε το προϊόν", null));
                                 }
 
                             } else if ("REMOVE".equalsIgnoreCase(upr.getAction())) {
                                 boolean removed = s1.removeProduct(upr.getProductName());
                                 if (removed) {
-                                    System.out.println(" Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "' από το κατάστημα '" + s1.getStoreName() + "'");
-                                    out.writeObject(new Response(true, " Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "'", null));
+                                    System.out.println("Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "' από το κατάστημα '" + s1.getStoreName() + "'");
+                                    out.writeObject(new Response(true, "Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "'", null));
                                 } else {
-                                    System.out.println(" Το προϊόν '" + upr.getProductName() + "' δεν βρέθηκε στο κατάστημα '" + s1.getStoreName() + "'");
-                                    out.writeObject(new Response(false, " Το προϊόν δεν βρέθηκε", null));
+                                    System.out.println("Το προϊόν '" + upr.getProductName() + "' δεν βρέθηκε στο κατάστημα '" + s1.getStoreName() + "'");
+                                    out.writeObject(new Response(false, "Το προϊόν δεν βρέθηκε", null));
                                 }
 
                             } else if ("REDUCE".equalsIgnoreCase(upr.getAction())) {
@@ -271,14 +271,14 @@ public class WorkerNode {
 
                                         if (reduceBy > currentAmount) {
                                             out.writeObject(new Response(false,
-                                                    " Δεν μπορεί να αφαιρεθεί ποσότητα μεγαλύτερη από το απόθεμα (" + currentAmount + " διαθέσιμα)", null));
+                                                    "Δεν μπορεί να αφαιρεθεί ποσότητα μεγαλύτερη από το απόθεμα (" + currentAmount + " διαθέσιμα)", null));
                                             out.flush();
                                             break;
                                         }
 
                                         p.setAvailableAmount(currentAmount - reduceBy);
 
-                                        System.out.printf(" Μειώθηκε ποσότητα για %s: -%d (από %d → %d)\n",
+                                        System.out.printf("Μειώθηκε ποσότητα για %s: -%d (από %d → %d)\n",
                                                 p.getProductName(), reduceBy, currentAmount, p.getAvailableAmount());
 
                                         out.writeObject(new Response(true, " Η ποσότητα μειώθηκε επιτυχώς", null));
@@ -381,7 +381,7 @@ public class WorkerNode {
                                 }
                             }
 
-                            out.writeObject(new Response(true, " Πωλήσεις προϊόντων", productStats));
+                            out.writeObject(new Response(true, "Πωλήσεις προϊόντων", productStats));
                             out.flush();
                             break;
                         case "ADD_STORE":
@@ -393,7 +393,7 @@ public class WorkerNode {
                                 } else {
                                     storeMap.put(storeName, store);
                                     out.writeObject(new Response(true, "Το κατάστημα αποθηκεύτηκε", null));
-                                    System.out.println("📥 Προστέθηκε κατάστημα: " + storeName);
+                                    System.out.println("Προστέθηκε κατάστημα: " + storeName);
                                 }
                             }
                             out.flush();
@@ -413,8 +413,8 @@ public class WorkerNode {
                         case "ADD_ORDER":
                             Order order = (Order) request.getPayload();
                             String targetStore = order.getStoreName();
-                            System.out.println(" Ζητήθηκε κατάστημα: '" + targetStore + "'");
-                            System.out.println(" Καταστήματα που έχει ο Worker: " + storeMap.keySet());
+                            System.out.println("Ζητήθηκε κατάστημα: '" + targetStore + "'");
+                            System.out.println("Καταστήματα που έχει ο Worker: " + storeMap.keySet());
 
                             Store target = storeMap.get(targetStore);
 
@@ -427,7 +427,7 @@ public class WorkerNode {
                             List<Product> products = target.getProducts();
                             Map<String, Integer> ordered = order.getProductsOrdered();
 
-                            System.out.println(" Ποσότητες πριν την παραγγελία:");
+                            System.out.println("Ποσότητες πριν την παραγγελία:");
                             products.forEach(p -> System.out.println(p.getProductName() + " → " + p.getAvailableAmount()));
 
                             boolean invalid = false;
@@ -460,7 +460,7 @@ public class WorkerNode {
                                     int before = product.getAvailableAmount();
                                     product.setAvailableAmount(before - quantity);
 
-                                    System.out.printf(" Αφαιρώ %d από '%s' → %d → %d\n", quantity, productName, before, product.getAvailableAmount());
+                                    System.out.printf("Αφαιρώ %d από '%s' → %d → %d\n", quantity, productName, before, product.getAvailableAmount());
 
                                     productSales.put(productName, productSales.getOrDefault(productName, 0) + quantity);
                                 }
@@ -469,7 +469,7 @@ public class WorkerNode {
                                 orderMap.computeIfAbsent(targetStore, k -> new ArrayList<>()).add(order);
                             }
 
-                            System.out.println(" Ποσότητες ΜΕΤΑ την παραγγελία:");
+                            System.out.println("Ποσότητες μετά την παραγγελία:");
                             products.forEach(p -> System.out.println(p.getProductName() + " → " + p.getAvailableAmount()));
 
                             out.writeObject(new Response(true, " Η παραγγελία καταχωρήθηκε", null));
@@ -479,14 +479,14 @@ public class WorkerNode {
 
                     }
                 } catch (Exception ex) {
-                    System.err.println(" EXCEPTION ΣΤΟ LOOP: " + ex.getMessage());
+                    System.err.println("EXCEPTION ΣΤΟ LOOP: " + ex.getMessage());
                     ex.printStackTrace();
                     break;
                 }
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println(" Worker σφάλμα: " + e.getMessage());
+            System.err.println("Worker σφάλμα: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -511,7 +511,7 @@ public class WorkerNode {
             WorkerNode worker = new WorkerNode();
             worker.start(masterHost, masterPort);
         } catch (Exception e) {
-            System.err.println(" Σφάλμα κατά την εκκίνηση Worker: " + e.getMessage());
+            System.err.println("Σφάλμα κατά την εκκίνηση Worker: " + e.getMessage());
             e.printStackTrace();
         }
     }

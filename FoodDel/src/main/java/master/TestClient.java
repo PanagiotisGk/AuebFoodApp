@@ -25,16 +25,16 @@ public class TestClient {
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
-            System.out.println(" Συνδέθηκα με τον Master Server!");
+            System.out.println("Συνδέθηκα με τον Master Server!");
 
             // ---------- Δημιουργία dummy request ------------
             Request pingRequest = new Request("PING", null);
             out.writeObject(pingRequest);
-            System.out.println(" Έστειλα request: " + pingRequest.getType());
+            System.out.println("Έστειλα request: " + pingRequest.getType());
 
             // Λήψη response
             Response response = (Response) in.readObject();
-            System.out.println(" Λήφθηκε απάντηση: " + response.getMessage());
+            System.out.println("Λήφθηκε απάντηση: " + response.getMessage());
             // Τέλος dummy request
 
             // ------------- Εύρεση όλων των Καταχωρημένων Καταστημάτων ----------------
@@ -117,16 +117,16 @@ public class TestClient {
                 int i = 1;
                 for (Store store : filteredStores) {
                     System.out.println(i + ". " + store.getStoreName());
-                    System.out.println("    Κατηγορία: " + store.getFoodCategory());
-                    System.out.println("    Βαθμολογία: " + store.getStars() );
-                    System.out.println("    Τιμή: " + store.getPriceCategory());
+                    System.out.println("Κατηγορία: " + store.getFoodCategory());
+                    System.out.println("Βαθμολογία: " + store.getStars() );
+                    System.out.println("Τιμή: " + store.getPriceCategory());
                     i++;
                 }
             }
             // ------------- Τέλος Εύρεσης καταστημάτων με βάση τα φίλτρα -------------
             
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println(" Σφάλμα στον Test Client: " + e.getMessage());
+            System.err.println("Σφάλμα στον Test Client: " + e.getMessage());
         }
     }
 }

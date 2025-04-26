@@ -25,20 +25,20 @@ public class MasterServer {
 
 
     public static void main(String[] args) {
-        System.out.println(" Master Server ξεκίνησε στη θύρα " + PORT);
+        System.out.println("Master Server ξεκίνησε στη θύρα " + PORT);
         int workerCounter = 1;
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println(" Νέα σύνδεση από: " + socket.getInetAddress());
+                System.out.println("Νέα σύνδεση από: " + socket.getInetAddress());
 
                 new Thread(new ClientHandler(socket)).start();
 
 
             }
         } catch (IOException e) {
-            System.err.println(" Σφάλμα στον Master Server: " + e.getMessage());
+            System.err.println("Σφάλμα στον Master Server: " + e.getMessage());
         }
     }
 
@@ -47,7 +47,7 @@ public class MasterServer {
     // Προσθήκη καινούργιου worker
     public static void addWorker(WorkerConnection worker) {
         workers.add(worker);
-        System.out.println(" Νέος Worker καταχωρήθηκε. Σύνολο Workers: " + workers.size());
+        System.out.println("Νέος Worker καταχωρήθηκε. Σύνολο Workers: " + workers.size());
     }
 
     // Εύρεση του worker που περιέχει το κατάστημα που ψάχνουμε
