@@ -150,7 +150,7 @@ public class ClientHandler implements Runnable {
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα φιλτραρίσματος", filteredStores));
                         break;
-                    // Εμφάνιση εσόδων ανά κατηγορία προιόντων
+                    // Εμφάνιση εσόδων ανά κατηγορία καταστήματος
                     case "CATEGORY_REVENUE":
                         Map<String, Double> totalRevenue = new HashMap<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
@@ -167,7 +167,7 @@ public class ClientHandler implements Runnable {
                         }
                         out.writeObject(new Response(true, " Συγκεντρωτικά έσοδα ανά κατηγορία", totalRevenue));
                         break;
-                    // Εμφάνιση εσόδων ανά προιόν
+                    // Εμφάνιση εσόδων ανά κατηγορία προϊόντος
                     case "CATEGORY_PRODUCT_SALES":
                         String category = (String) request.getPayload();
                         Map<String, Double> finalMap = new HashMap<>();
