@@ -71,16 +71,23 @@ public class WorkerNode {
                             break;
 
                         case "SEARCH_ALL_STORES":
-                            SearchFilters filtersForAllStores = (SearchFilters) request.getPayload();
-                            List<Store> allRegisterStores = new ArrayList<>();
-
-                            for (Store allstores : storeMap.values()) {      
-                                        allRegisterStores.add(allstores);
+                            List<Store> liveStores = new ArrayList<>();
+                            synchronized (storeMap) {
+                                for (Store s : storeMap.values()) {
+                                    Store liveStore = new Store(
+                                            s.getStoreName(),
+                                            s.getLatitude(),
+                                            s.getLongitude(),
+                                            s.getFoodCategory(),
+                                            s.getStars(),
+                                            s.getNoOfVotes(),
+                                            s.getStoreLogo(),
+                                            new ArrayList<>(s.getProducts())
+                                    );
+                                    liveStores.add(liveStore);
                                 }
-                            
-                            System.out.println("Αποτελέσματα Search για όλα τα καταχωρημένα καταστήματα: " + allRegisterStores.size());
-                            Response responseForAllStores = new Response(true, " Όλα τα καταχωρημένα Καταστήματα ", allRegisterStores);
-                            out.writeObject(responseForAllStores);
+                            }
+                            out.writeObject(new Response(true, "Όλα τα καταστήματα (live snapshot)", liveStores));
                             out.flush();
                             break;
 
@@ -106,18 +113,27 @@ public class WorkerNode {
                             break;
 
                         case "FILTER_STORES":
-                            System.out.println("Worker έλαβε αίτημα: FILTER_STORES");
+                            System.out.println("📩 Worker έλαβε αίτημα: FILTER_STORES");
                             SearchFilters filtersForStores = (SearchFilters) request.getPayload();
+
                             List<Store> filteredStores = storeMap.values().stream()
-                                    .filter(store2 -> (filtersForStores.getFoodCategories() == null || filtersForStores.getFoodCategories().contains(store2.getFoodCategory())))
-                                    .filter(store2 -> store2.getStars() >= filtersForStores.getMinStars())
-                                    .filter(store2 -> (filtersForStores.getPriceCategories() == null || filtersForStores.getPriceCategories().contains(store2.getPriceCategory())))
+                                    .filter(store ->
+                                            filtersForStores.getFoodCategories() == null ||
+                                                    filtersForStores.getFoodCategories().isEmpty() ||
+                                                    filtersForStores.getFoodCategories().contains(store.getFoodCategory())
+                                    )
+                                    .filter(store ->
+                                            store.getStars() >= filtersForStores.getMinStars()
+                                    )
+                                    .filter(store ->
+                                            filtersForStores.getPriceCategories() == null ||
+                                                    filtersForStores.getPriceCategories().isEmpty() ||
+                                                    filtersForStores.getPriceCategories().contains(store.getPriceCategory())
+                                    )
                                     .collect(Collectors.toList());
 
                             System.out.println("Αποτελέσματα φίλτρων: " + filteredStores.size());
-                            System.out.println("Αποτελέσματα φίλτρων: " + filteredStores);
-                            Response filterResponse = new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores);
-                            out.writeObject(filterResponse);
+                            out.writeObject(new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores));
                             out.flush();
                             break;
 
@@ -199,7 +215,7 @@ public class WorkerNode {
                                 for (Product p : s1.getProducts()) {
                                     if (p.getProductName().equalsIgnoreCase(upr.getProductName())) {
 
-                                        //  Προσθήκη ποσότητας
+                                        // Προσθήκη ποσότητας
                                         if (upr.getAvailableAmount() > 0) {
                                             int prev = p.getAvailableAmount();
                                             int newAmount = prev + upr.getAvailableAmount();
@@ -207,13 +223,13 @@ public class WorkerNode {
                                             System.out.println("Προστέθηκαν " + upr.getAvailableAmount() + " τεμάχια στο προϊόν '" + p.getProductName() + "'. Νέα ποσότητα: " + newAmount);
                                         }
 
-                                        //  Ενημέρωση τιμής
+                                        // Ενημέρωση τιμής
                                         if (upr.getPrice() > 0 && p.getPrice() != upr.getPrice()) {
                                             System.out.println("Ενημερώθηκε η τιμή προϊόντος '" + p.getProductName() + "' από " + p.getPrice() + "€ σε " + upr.getPrice() + "€");
                                             p.setPrice(upr.getPrice());
                                         }
 
-                                        //  Ενημέρωση τύπου
+                                        // Ενημέρωση τύπου
                                         if (upr.getProductType() != null && !upr.getProductType().equalsIgnoreCase("null") &&
                                                 !p.getProductType().equalsIgnoreCase(upr.getProductType())) {
                                             System.out.println("Ενημερώθηκε ο τύπος προϊόντος '" + p.getProductName() + "' από " + p.getProductType() + " σε " + upr.getProductType());
@@ -228,7 +244,8 @@ public class WorkerNode {
                                 if (!updated) {
                                     if (upr.getAvailableAmount() <= 0 || upr.getPrice() <= 0 ||
                                             upr.getProductType() == null || upr.getProductType().equalsIgnoreCase("null")) {
-                                        out.writeObject(new Response(false, " Για νέο προϊόν απαιτείται θετική ποσότητα, τιμή και τύπος", null));
+                                        out.writeObject(new Response(false, "Για νέο προϊόν απαιτείται θετική ποσότητα, τιμή και τύπος", null));
+                                        out.flush();
                                     } else {
                                         Product newProd = new Product(
                                                 upr.getProductName(),
@@ -237,25 +254,30 @@ public class WorkerNode {
                                                 upr.getPrice()
                                         );
                                         s1.getProducts().add(newProd);
+                                        s1.getPriceCategory();
+
+                                        System.out.println("Προστέθηκε νέο προϊόν '" + newProd.getProductName() + "' στο κατάστημα '" + s1.getStoreName() + "'");
                                         out.writeObject(new Response(true, "Προστέθηκε νέο προϊόν", null));
+                                        out.flush();
                                     }
                                 } else {
                                     out.writeObject(new Response(true, "Ενημερώθηκε το προϊόν", null));
+                                    out.flush();
                                 }
 
                             } else if ("REMOVE".equalsIgnoreCase(upr.getAction())) {
                                 boolean removed = s1.removeProduct(upr.getProductName());
                                 if (removed) {
+                                    s1.getPriceCategory();
                                     System.out.println("Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "' από το κατάστημα '" + s1.getStoreName() + "'");
                                     out.writeObject(new Response(true, "Αφαιρέθηκε το προϊόν '" + upr.getProductName() + "'", null));
                                 } else {
-                                    System.out.println("Το προϊόν '" + upr.getProductName() + "' δεν βρέθηκε στο κατάστημα '" + s1.getStoreName() + "'");
                                     out.writeObject(new Response(false, "Το προϊόν δεν βρέθηκε", null));
                                 }
+                                out.flush();
 
                             } else if ("REDUCE".equalsIgnoreCase(upr.getAction())) {
                                 List<Product> products = s1.getProducts();
-
                                 boolean found = false;
 
                                 for (Product p : products) {
@@ -264,14 +286,13 @@ public class WorkerNode {
                                         int reduceBy = upr.getAvailableAmount();
 
                                         if (reduceBy <= 0) {
-                                            out.writeObject(new Response(false, " Η ποσότητα προς αφαίρεση πρέπει να είναι θετική", null));
+                                            out.writeObject(new Response(false, "Η ποσότητα προς αφαίρεση πρέπει να είναι θετική", null));
                                             out.flush();
                                             break;
                                         }
 
                                         if (reduceBy > currentAmount) {
-                                            out.writeObject(new Response(false,
-                                                    "Δεν μπορεί να αφαιρεθεί ποσότητα μεγαλύτερη από το απόθεμα (" + currentAmount + " διαθέσιμα)", null));
+                                            out.writeObject(new Response(false, "Δεν μπορεί να αφαιρεθεί ποσότητα μεγαλύτερη από το απόθεμα (" + currentAmount + " διαθέσιμα)", null));
                                             out.flush();
                                             break;
                                         }
@@ -281,7 +302,7 @@ public class WorkerNode {
                                         System.out.printf("Μειώθηκε ποσότητα για %s: -%d (από %d → %d)\n",
                                                 p.getProductName(), reduceBy, currentAmount, p.getAvailableAmount());
 
-                                        out.writeObject(new Response(true, " Η ποσότητα μειώθηκε επιτυχώς", null));
+                                        out.writeObject(new Response(true, "Η ποσότητα μειώθηκε επιτυχώς", null));
                                         out.flush();
                                         found = true;
                                         break;
@@ -289,12 +310,10 @@ public class WorkerNode {
                                 }
 
                                 if (!found) {
-                                    out.writeObject(new Response(false, " Το προϊόν δεν βρέθηκε στο κατάστημα", null));
+                                    out.writeObject(new Response(false, "Το προϊόν δεν βρέθηκε στο κατάστημα", null));
                                     out.flush();
                                 }
                             }
-
-                            out.flush();
                             break;
                         case "CATEGORY_PRODUCT_SALES":
                             String categoryRequested = (String) request.getPayload();
@@ -402,10 +421,31 @@ public class WorkerNode {
                         case "GET_PRODUCTS":
                             String requestedStore = (String) request.getPayload();
                             Store s = storeMap.get(requestedStore);
+
                             if (s == null) {
-                                out.writeObject(new Response(false, " Το κατάστημα δεν βρέθηκε", null));
+                                out.writeObject(new Response(false, "❌ Το κατάστημα δεν βρέθηκε", null));
                             } else {
-                                out.writeObject(new Response(true, " Προϊόντα καταστήματος", s.getProducts()));
+                                // 🔥 Εδώ κάνουμε DEBUG να δούμε τα τρέχοντα προϊόντα
+                                System.out.println("📦 DEBUG - Προϊόντα καταστήματος '" + requestedStore + "':");
+                                for (Product p : s.getProducts()) {
+                                    System.out.printf(" - %s (%s) %.2f€, Διαθέσιμα: %d\n",
+                                            p.getProductName(), p.getProductType(), p.getPrice(), p.getAvailableAmount());
+                                }
+                                s.getPriceCategory();
+
+                                List<Product> copyProducts = new ArrayList<>();
+                                for (Product p : s.getProducts()) {
+                                    Product copy = new Product(
+                                            p.getProductName(),
+                                            p.getProductType(),
+                                            p.getAvailableAmount(),
+                                            p.getPrice()
+                                    );
+                                    copyProducts.add(copy);
+                                }
+
+                                out.writeObject(new Response(true, "📦 Προϊόντα καταστήματος", copyProducts));
+                                out.flush();
                             }
                             out.flush();
                             break;

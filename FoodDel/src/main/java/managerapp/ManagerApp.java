@@ -54,7 +54,7 @@ public class ManagerApp {
                     case 1:
 
                         while (true) {
-                            printAvailableStores("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/stores/", addedStores);
+                            printAvailableStores("resources/stores/", addedStores);
 
                             System.out.print("Δώσε το όνομα του καταστήματος τύπου Pizza_Fun (ή 'τέλος' για έξοδο): ");
                             String storeName = scanner.nextLine().trim();
@@ -66,7 +66,7 @@ public class ManagerApp {
                                 continue;
                             }
 
-                            String storeFilePath = "/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/stores/" + storeName + ".json";
+                            String storeFilePath = "resources/stores/" + storeName + ".json";
                             System.out.println("Διαβάζω από αρχείο: " + storeFilePath);
 
                             Store store = readStoreFromJson(storeFilePath);
@@ -163,6 +163,8 @@ public class ManagerApp {
 
 
                     case 4:
+
+
                         if (addedStores.isEmpty()) {
                             System.out.println("Δεν υπάρχουν καταχωρημένα καταστήματα.");
                             break;
@@ -180,8 +182,15 @@ public class ManagerApp {
                         out.writeObject(getProductsReq);
                         out.flush();
 
+
                         Response productResp = (Response) in.readObject();
-                        Object payload = productResp.getData(); //  χρησιμοποιούμε getData()
+                        Object payload = productResp.getData();
+                        System.out.println("🔍 Έλαβα απάντηση από GET_PRODUCTS:");
+                        System.out.println(" - Success: " + productResp.isSuccess());
+                        System.out.println(" - Message: " + productResp.getMessage());
+                        System.out.println(" - Payload class: " + (payload != null ? payload.getClass().getName() : "null"));
+                        System.out.println(" - Payload περιεχόμενο: " + payload);
+
 
                         if (productResp.isSuccess()) {
                             if (payload instanceof List<?>) {

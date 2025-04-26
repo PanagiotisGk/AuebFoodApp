@@ -19,10 +19,13 @@ public class ClientHandler implements Runnable {
         this.socket = socket;
     }
 
+    private boolean isWorker = false;
+
     @Override
     public void run() {
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
+
 
         try {
             out = new ObjectOutputStream(socket.getOutputStream());
@@ -33,6 +36,7 @@ public class ClientHandler implements Runnable {
             System.out.println("Λήφθηκε request τύπου: " + firstRequest.getType());
 
             if ("REGISTER_WORKER".equals(firstRequest.getType())) {
+                isWorker = true;
                 String workerId = "Worker-" + MasterServer.getNextWorkerId();
 
                 WorkerConnection worker = new WorkerConnection(socket, out, in, workerId);
@@ -215,12 +219,25 @@ public class ClientHandler implements Runnable {
                         break;
                 }
                 request = (Request) in.readObject();
-                System.out.println(" Νέο request τύπου: " + request.getType());
+                System.out.println("Νέο request τύπου: " + request.getType());
             }
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println(" Σύνδεση έκλεισε: " + e.getMessage());
+            System.out.println("Σύνδεση έκλεισε: " + e.getMessage());
         } finally {
-            System.out.println(" ClientHandler τελείωσε και έκλεισε socket: " + socket);
+            // 🛑 Μόνο αν ΔΕΝ είναι Worker κλείνουμε το socket
+            if (!isWorker) {
+                try {
+                    if (socket != null && !socket.isClosed()) {
+                        socket.close();
+                        System.out.println("🧹 Έκλεισα το socket του ClientHandler: " + socket.getRemoteSocketAddress());
+                    }
+                } catch (IOException e) {
+                    System.out.println("❗ Σφάλμα στο κλείσιμο του socket: " + e.getMessage());
+                }
+            } else {
+                System.out.println("🔵 Worker ClientHandler παραμένει ενεργός.");
+            }
+            System.out.println("🧨 ClientHandler για " + socket.getRemoteSocketAddress() + " τερματίστηκε.");
         }
     }
 
