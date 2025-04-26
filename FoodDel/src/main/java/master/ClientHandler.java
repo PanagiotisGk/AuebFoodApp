@@ -5,6 +5,7 @@ import common.model.Response;
 import common.model.SearchFilters;
 import common.model.Store;
 import common.model.Order;
+import common.model.RateStoreRequest;
 import common.model.UpdateProductRequest;
 
 import java.io.*;
@@ -117,7 +118,7 @@ public class ClientHandler implements Runnable {
                         break;
                     // Εύρεση όλων των καταχωρημένων καταστημάτων 
                     case "SEARCH_ALL_STORES":
-                        SearchFilters filtersAllStores = (SearchFilters) request.getPayload();
+                        // SearchFilters filtersAllStores = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearchAllStores = new ArrayList<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
                             w.sendRequest(request);
@@ -130,7 +131,7 @@ public class ClientHandler implements Runnable {
                         break;
                     // Εύρεση καταστημάτων σε ακτίνα 5χλμ
                     case "SEARCH_5KM_RANGE":
-                        SearchFilters filters = (SearchFilters) request.getPayload();
+                        // SearchFilters filters = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearch5kmRange = new ArrayList<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
                             w.sendRequest(request);
@@ -143,7 +144,7 @@ public class ClientHandler implements Runnable {
                         break;
                     // Εύρεση καταστημάτων με βάση custom φίλτρων
                     case "FILTER_STORES":
-                        SearchFilters filterCriteria = (SearchFilters) request.getPayload();
+                        // SearchFilters filterCriteria = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = new ArrayList<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
                             w.sendRequest(request);
@@ -214,6 +215,15 @@ public class ClientHandler implements Runnable {
                         out.writeObject(new Response(true, " Πωλήσεις ανά προϊόν", totalSales));
                         break;
 
+                    //  Αξιολόγηση Καταστημάτων
+                    case "RATE_STORE":
+                        Object payloadRate = request.getPayload();
+                        if (payloadRate instanceof RateStoreRequest) {
+                            RateStoreRequest rateRequest = (RateStoreRequest) payloadRate;
+                            processStoreRating(rateRequest, out);
+                        }
+                        break;
+
                     default:
                         out.writeObject(new Response(false, "Άγνωστο αίτημα", null));
                         break;
@@ -265,6 +275,23 @@ public class ClientHandler implements Runnable {
         } catch (ClassNotFoundException e) {
             out.writeObject(new Response(false, " Σφάλμα κατά την ανάγνωση της απάντησης του Worker", null));
         }
+    }
+
+    // Μέθοδος για την αξιολόγηση καταστήματος
+    private void processStoreRating(RateStoreRequest rateRequest, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        String storeName = rateRequest.getStoreName();
+        WorkerConnection worker = MasterServer.getWorkerForStore(storeName);
+    
+        if (worker == null) {
+            out.writeObject(new Response(false, "Το κατάστημα δεν βρέθηκε", null));
+            out.flush();
+            return;
+        }
+    
+        worker.sendRequest(new Request("RATE_STORE", rateRequest));
+        Response workerResponse = worker.readResponse();
+        out.writeObject(workerResponse);
+        out.flush();
     }
 
 }

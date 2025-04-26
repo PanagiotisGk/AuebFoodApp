@@ -1,6 +1,7 @@
 package master;
 
 import common.model.Request;
+import common.model.Response;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,5 +41,14 @@ public class WorkerConnection {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public Response readResponse() throws IOException, ClassNotFoundException {
+        Object response = in.readObject();
+        if (response instanceof Response) {
+            return (Response) response;
+        } else {
+            throw new IOException("Δεν λήφθηκε απάντηση από τον Worker.");
+        }
     }
 }

@@ -12,7 +12,7 @@ public class Store implements Serializable {
     private double latitude;
     private double longitude;
     private String foodCategory;
-    private int stars;
+    private double stars;
     private int noOfVotes;
     private String storeLogo;
     private List<Product> products;
@@ -25,7 +25,7 @@ public class Store implements Serializable {
     }
 
     public Store(String storeName, double latitude, double longitude, String foodCategory,
-                 int stars, int noOfVotes, String storeLogo, List<Product> products) {
+                 double stars, int noOfVotes, String storeLogo, List<Product> products) {
         this.storeName = storeName;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -87,7 +87,7 @@ public class Store implements Serializable {
         return foodCategory;
     }
 
-    public int getStars() {
+    public double getStars() {
         return stars;
     }
 
@@ -118,6 +118,14 @@ public class Store implements Serializable {
 
     public synchronized void addRevenue(double amount) {
         this.totalRevenue += amount;
+    }
+
+    public void setStars(double stars) {
+        this.stars = stars;
+    }
+    
+    public void setNoOfVotes(int noOfVotes) {
+        this.noOfVotes = noOfVotes;
     }
 
     @Override

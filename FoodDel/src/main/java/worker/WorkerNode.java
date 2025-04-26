@@ -420,6 +420,7 @@ public class WorkerNode {
 
                         case "GET_PRODUCTS":
                             String requestedStore = (String) request.getPayload();
+                            
                             Store s = storeMap.get(requestedStore);
 
                             if (s == null) {
@@ -447,6 +448,7 @@ public class WorkerNode {
                                 out.writeObject(new Response(true, "📦 Προϊόντα καταστήματος", copyProducts));
                                 out.flush();
                             }
+                            
                             out.flush();
                             break;
 
@@ -515,7 +517,11 @@ public class WorkerNode {
                             out.writeObject(new Response(true, " Η παραγγελία καταχωρήθηκε", null));
                             out.flush();
                             break;
-
+                        
+                        case "RATE_STORE":
+                            RateStoreRequest rateRequest = (RateStoreRequest) request.getPayload();
+                            handleRateStore(rateRequest, out);
+                            break;
 
                     }
                 } catch (Exception ex) {
@@ -541,6 +547,28 @@ public class WorkerNode {
                         Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    private void handleRateStore(RateStoreRequest rateRequest, ObjectOutputStream out) throws IOException {
+        String storeName = rateRequest.getStoreName();
+        int rating = rateRequest.getRating();
+    
+        synchronized (storeMap) {
+            Store store = storeMap.get(storeName);
+            if (store != null) {
+                double totalStars = store.getStars() * store.getNoOfVotes();
+                totalStars += rating;
+                store.setNoOfVotes(store.getNoOfVotes() + 1);
+                System.out.println(store.getNoOfVotes());
+                store.setStars(totalStars / store.getNoOfVotes());
+                System.out.println("Αστέρια : " + store.getStars());
+    
+                out.writeObject(new Response(true, "Η βαθμολογία καταχωρήθηκε", null));
+            } else {
+                out.writeObject(new Response(false, "Το κατάστημα δεν βρέθηκε", null));
+            }
+        }
+        out.flush();
     }
 
     public static void main(String[] args) {

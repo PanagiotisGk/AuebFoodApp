@@ -98,12 +98,12 @@ public class ManagerApp {
 
                     case 2:
 
-                        printAvailableOrders("resources/orders/");
+                        printAvailableOrders("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/orders/");
 
                         System.out.print("Δώσε όνομα παραγγελίας (χωρίς .json): ");
                         String orderName = scanner.nextLine().trim();
 
-                        String orderPath = "resources/orders/" + orderName + ".json";
+                        String orderPath = "/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/orders/" + orderName + ".json";
                         Order order = readOrderFromJson(orderPath);
 
                         if (order == null) break;
