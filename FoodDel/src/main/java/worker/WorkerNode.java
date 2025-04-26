@@ -521,6 +521,7 @@ public class WorkerNode {
                         case "RATE_STORE":
                             RateStoreRequest rateRequest = (RateStoreRequest) request.getPayload();
                             handleRateStore(rateRequest, out);
+                            out.flush();
                             break;
 
                     }
