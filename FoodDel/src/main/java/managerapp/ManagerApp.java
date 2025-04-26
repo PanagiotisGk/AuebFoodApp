@@ -54,7 +54,7 @@ public class ManagerApp {
                     case 1:
 
                         while (true) {
-                            printAvailableStores("resources/stores/", addedStores);
+                            printAvailableStores("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/stores/", addedStores);
 
                             System.out.print("Δώσε το όνομα του καταστήματος τύπου Pizza_Fun (ή 'τέλος' για έξοδο): ");
                             String storeName = scanner.nextLine().trim();
@@ -66,7 +66,7 @@ public class ManagerApp {
                                 continue;
                             }
 
-                            String storeFilePath = "resources/stores/" + storeName + ".json";
+                            String storeFilePath = "/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/stores/" + storeName + ".json";
                             System.out.println("Διαβάζω από αρχείο: " + storeFilePath);
 
                             Store store = readStoreFromJson(storeFilePath);
