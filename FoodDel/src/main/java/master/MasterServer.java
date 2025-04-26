@@ -18,7 +18,7 @@ public class MasterServer {
     private static final int PORT = 5000;
     private static int workerCounter = 1;
     private static final List<WorkerConnection> workers = new ArrayList<>();
-
+    private static final List<WorkerConnection> workersForUse = new ArrayList<>();
     private static final Map<String, WorkerConnection> storeToWorkerMap = new HashMap<>();
     private static int roundRobinIndex = 0;
 
@@ -47,6 +47,7 @@ public class MasterServer {
     // Προσθήκη καινούργιου worker
     public static void addWorker(WorkerConnection worker) {
         workers.add(worker);
+        workersForUse.add(worker);
         System.out.println("Νέος Worker καταχωρήθηκε. Σύνολο Workers: " + workers.size());
     }
 
@@ -77,6 +78,21 @@ public class MasterServer {
         return workers.get(0); // ή Random, ή round-robin
     }
 
+    // Εύρεση διαθέσιμου worker, εάν υπάρχει για χρήση από κατάστημα
+    public static WorkerConnection getWorkersForUse() {
+        if (workersForUse.isEmpty()) return null;
+        return workersForUse.get(0); // ή Random, ή round-robin
+    }
+
+    // Remove available worker for use 
+    public static boolean removeWorkersForUse() {
+        if (workersForUse.isEmpty()) { 
+            return false;
+        } else {
+            workersForUse.remove(0);
+            return true;
+        } 
+    }
     // 
     public static synchronized WorkerConnection getNextWorker() {
         if (workers.isEmpty()) return null;

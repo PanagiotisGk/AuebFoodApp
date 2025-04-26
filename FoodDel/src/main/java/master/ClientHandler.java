@@ -88,6 +88,17 @@ public class ClientHandler implements Runnable {
                         break;
                     // Προσθήκη καταστήματος
                     case "ADD_STORE":
+                        // Break εάν δεν υπάρχει διαθέσιμος worker
+                        WorkerConnection availableWorker = MasterServer.getAnyAvailableWorker();
+                        if (availableWorker == null) {
+                            out.writeObject(new Response(false, "Δεν υπάρχει διαθέσιμος Worker", null));
+                            break;
+                        }
+                        boolean remainingWorkers = MasterServer.removeWorkersForUse();
+                        if (remainingWorkers == false){
+                            out.writeObject(new Response(false, "Δεν υπάρχει διαθέσιμος Worker για να του προσθέσουμε κατάστημα", null));
+                            break;
+                        }
                         Object payload = request.getPayload();
                         if (payload instanceof List<?>) {
                             List<?> storesList = (List<?>) payload;
@@ -175,7 +186,7 @@ public class ClientHandler implements Runnable {
                             }
                         }
                         finalMap.put("total", total);
-                        out.writeObject(new Response(true, " Συγκεντρωτικά έσοδα κατηγορίας " + category, finalMap));
+                        out.writeObject(new Response(true, " Συγκεντρωτικά έσοδα προϊόντος " + category, finalMap));
                         break;
                     //  Εμφάνιση πωλήσεων ανά προϊόν
                     case "PRODUCT_SALES":
