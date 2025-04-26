@@ -54,7 +54,7 @@ public class ManagerApp {
                     case 1:
 
                         while (true) {
-                            printAvailableStores("resources/stores/", addedStores);
+                            printAvailableStores("/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/stores/", addedStores);
 
                             System.out.print("Δώσε το όνομα του καταστήματος τύπου Pizza_Fun (ή 'τέλος' για έξοδο): ");
                             String storeName = scanner.nextLine().trim();
@@ -66,7 +66,7 @@ public class ManagerApp {
                                 continue;
                             }
 
-                            String storeFilePath = "resources/stores/" + storeName + ".json";
+                            String storeFilePath = "/home/dimitris/Documents/OPA/DS/Ergasia/AuebFoodApp/resources/stores/" + storeName + ".json";
                             System.out.println("Διαβάζω από αρχείο: " + storeFilePath);
 
                             Store store = readStoreFromJson(storeFilePath);
@@ -81,10 +81,17 @@ public class ManagerApp {
                             out.flush();
 
                             Response resp = (Response) in.readObject();
-                            System.out.println("Απάντηση: " + resp.getMessage());
 
-                            addedStores.add(storeName);
-                            Thread.sleep(100);
+                            if (!resp.isSuccess()) {
+                                // Αν το success είναι false
+                                System.out.println("Αποτυχία: " + resp.getMessage());
+                            } else {
+                                // Αν το success είναι true
+                                System.out.println("Επιτυχία: " + resp.getMessage());
+                                addedStores.add(storeName);
+                                Thread.sleep(100);
+                            }
+                            
                         }
                         break;
 
