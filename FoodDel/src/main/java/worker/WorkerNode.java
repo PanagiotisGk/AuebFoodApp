@@ -94,21 +94,22 @@ public class WorkerNode {
                         case "SEARCH_5KM_RANGE":
                             SearchFilters filtersFor5kmRange = (SearchFilters) request.getPayload();
                             List<Store> nearbyStores = new ArrayList<>();
+                            synchronized (storeMap) {
+                                for (Store store5km : storeMap.values()) {
+                                    double distance = distanceInKm(
+                                            filtersFor5kmRange.getClientLatitude(),
+                                            filtersFor5kmRange.getClientLongitude(),
+                                            store5km.getLatitude(),
+                                            store5km.getLongitude());
 
-                            for (Store store5km : storeMap.values()) {
-                                double distance = distanceInKm(
-                                        filtersFor5kmRange.getClientLatitude(),
-                                        filtersFor5kmRange.getClientLongitude(),
-                                        store5km.getLatitude(),
-                                        store5km.getLongitude());
-
-                                if (distance <= 5) {
-                                    nearbyStores.add(store5km);
+                                    if (distance <= 5) {
+                                        nearbyStores.add(store5km);
+                                    }
                                 }
+                                System.out.println("Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
+                                Response response = new Response(true, "Καταστήματα σε ακτίνα 5km", nearbyStores);
+                                out.writeObject(response);
                             }
-                            System.out.println("Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
-                            Response response = new Response(true, "Καταστήματα σε ακτίνα 5km", nearbyStores);
-                            out.writeObject(response);
                             out.flush();
                             break;
 
