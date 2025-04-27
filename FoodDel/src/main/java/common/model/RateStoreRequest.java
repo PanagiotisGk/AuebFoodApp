@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 public class RateStoreRequest implements Serializable {
 
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
 
     private String storeName;
-    private int rating; // Αστέρια Αξιολόγησης
+    private int rating; // Asteria axiologisis
 
     public RateStoreRequest(String storeName, int rating) {
         this.storeName = storeName;

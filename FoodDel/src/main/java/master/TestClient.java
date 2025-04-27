@@ -45,7 +45,7 @@ public class TestClient {
 
                 switch (choice) {
                     case 1:
-                        // Ζήτα όλα τα καταστήματα
+                        // Zitame ola ta katastimata
                         Request searchAllStores = new Request("SEARCH_ALL_STORES", null);
                         out.writeObject(searchAllStores);
                         out.flush();
@@ -73,7 +73,7 @@ public class TestClient {
                         break;
 
                     case 2:
-                        //  Ζήτα προϊόντα συγκεκριμένου καταστήματος
+                        //  Zitame proionta sygkekrimenou katastimatos
                         System.out.print("Δώσε όνομα καταστήματος: ");
                         String storeName = scanner.nextLine().trim();
 
@@ -107,7 +107,7 @@ public class TestClient {
 
                     case 3:
                         // example of cordinates (37.9755, 23.7348)
-                        //  Ζήτα τις συντεταγμένες του πελάτη
+                        //  Zitame tis syntetagmenes tou pelati
                         System.out.print("Δώσε clientLatitude: ");
                         double clLatitude = Double.parseDouble(scanner.nextLine().trim());
                         System.out.print("Δώσε clientLongitude: ");
@@ -118,7 +118,7 @@ public class TestClient {
                         Request searchRequest5km = new Request("SEARCH_5KM_RANGE", filtersFor5kmRange);
                         out.writeObject(searchRequest5km);
 
-                        // Λήψη response
+                        // Lipsi response
                         Response response5km = (Response) in.readObject();
                         List<Store> stores5km = (List<Store>) response5km.getData();
                         if (stores5km.isEmpty()) {
@@ -145,7 +145,7 @@ public class TestClient {
                     case 4: 
                         // example of cordinates (37.9755, 23.7348)
 
-                        //  Ζήτα τις συντεταγμένες του πελάτη
+                        //  Zitame tis sintetagmenes tou pelati
                         System.out.print("Δώσε clientLatitude: ");
                         double cLatitude = Double.parseDouble(scanner.nextLine().trim());
                         System.out.print("Δώσε clientLongitude: ");
@@ -167,7 +167,7 @@ public class TestClient {
                         Request filterRequest = new Request("FILTER_STORES", filtersForStores);
                         out.writeObject(filterRequest);
 
-                        // Λήψη απάντησης
+                        // Lipsi apantisis
                         Response filterResponse = (Response) in.readObject();
                         List<Store> filteredStores = (List<Store>) filterResponse.getData();
 
@@ -187,7 +187,7 @@ public class TestClient {
                         break;
 
                     case 5:
-                        // Βαθμολόγησης Καταστήματος
+                        // Vathmologisi katastimatos
                         System.out.print("Δώσε όνομα καταστήματος: ");
                         String nameStore = scanner.nextLine().trim();
                         System.out.print("Δώσε την βαθμολογία που επιθυμείς να βάλεις στο κατάστημα (Η βαθμολογία πρέπει να είναι από 1 έως 5): ");

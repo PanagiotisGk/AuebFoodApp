@@ -83,10 +83,10 @@ public class ManagerApp {
                             Response resp = (Response) in.readObject();
 
                             if (!resp.isSuccess()) {
-                                // Αν το success είναι false
+                                // An to success einai false
                                 System.out.println("Αποτυχία: " + resp.getMessage());
                             } else {
-                                // Αν το success είναι true
+                                // An to success einai true
                                 System.out.println("Επιτυχία: " + resp.getMessage());
                                 addedStores.add(storeName);
                                 Thread.sleep(100);
@@ -345,7 +345,7 @@ public class ManagerApp {
             e.printStackTrace();
         }
     }
-    // Εισαγωγή καταστημάτων από το αντίστοιχο json αρχείο
+    // Eisagogi ton katastimaton apo to antistixo json arxeio
     private static Store readStoreFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -355,7 +355,7 @@ public class ManagerApp {
             return null;
         }
     }
-    // Εισαγωγή παραγγελίας από το αντίστοιχο json αρχείο
+    // Eisagwgi paraggelias apo to antistixo json arxeio
     private static Order readOrderFromJson(String filename) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -365,7 +365,7 @@ public class ManagerApp {
             return null;
         }
     }
-    // Εμφάνιση διαθέσιμων καταστημάτων για εισαγωγή
+    // Emfanisi diathesimwn katastimatwn gia eisagwgi
     private static void printAvailableStores(String folderPath, List<String> exclude) {
         File folder = new File(folderPath);
 
@@ -390,7 +390,7 @@ public class ManagerApp {
             }
         }
     }
-    // Εμφάνιση διαθέσιμων παραγγελιών για καταχώρηση
+    // Emfanisi diathesimwn paraggeliwn gia kataxwrisi
     private static void printAvailableOrders(String folderPath) {
         File folder = new File(folderPath);
 

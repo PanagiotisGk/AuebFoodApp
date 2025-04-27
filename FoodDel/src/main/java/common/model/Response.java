@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class Response implements Serializable {
 
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
 
     private boolean success;
     private String message;
-    private Object data; // λίστα καταστημάτων, αποτελέσματα αναζήτησης κλπ.
+    private Object data; // lista katastimatwn, apotelesmata etc
 
     public Response(boolean success, String message, Object data) {
         this.success = success;

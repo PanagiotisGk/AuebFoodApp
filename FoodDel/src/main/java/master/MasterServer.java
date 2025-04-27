@@ -42,27 +42,27 @@ public class MasterServer {
         }
     }
 
-    // Βοηθητικές συναρτήσεις για τους workers
+    // Voithitikes synartiseis gia tous workers
 
-    // Προσθήκη καινούργιου worker
+    // Prosthiki neou worker
     public static void addWorker(WorkerConnection worker) {
         workers.add(worker);
         workersForUse.add(worker);
         System.out.println("Νέος Worker καταχωρήθηκε. Σύνολο Workers: " + workers.size());
     }
 
-    // Εύρεση του worker που περιέχει το κατάστημα που ψάχνουμε
+    // Evresi tou worker pou periexei to katastima pou psaxnoume
     public static WorkerConnection getWorkerForStore(String storeName) {
         return storeToWorkerMap.get(storeName);
     }
 
 
-    // Εμφάνιση όλων των workers
+    // Emfanisi olwn twn workers
     public static List<WorkerConnection> getWorkers() {
         return workers;
     }
 
-    // Προσθήκη id στον worker
+    // Prosthiki id ston worker
     public static synchronized int getNextWorkerId() {
         return workerCounter++;
     }
@@ -72,13 +72,13 @@ public class MasterServer {
         storeToWorkerMap.put(storeName, worker);
     }
 
-    // Εύρεση διαθέσιμου worker, εάν υπάρχει
+    // Evresi diathesimou worker, ean yparxei
     public static WorkerConnection getAnyAvailableWorker() {
         if (workers.isEmpty()) return null;
-        return workers.get(0); // ή Random, ή round-robin
+        return workers.get(0); // h Random, h round-robin
     }
 
-    // Εύρεση διαθέσιμου worker, εάν υπάρχει για χρήση από κατάστημα
+    // Evresi diathesimou worker, ean yparxei gia xrisi apo katastima
     public static WorkerConnection getWorkersForUse() {
         if (workersForUse.isEmpty()) return null;
         return workersForUse.get(0); // ή Random, ή round-robin

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SearchFilters implements Serializable {
 
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
 
     private double clientLatitude;

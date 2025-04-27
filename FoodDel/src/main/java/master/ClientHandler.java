@@ -50,12 +50,12 @@ public class ClientHandler implements Runnable {
 
             }
 
-            // Από εδώ και κάτω διαχείριση αιτημάτων για Manager ή άλλους clients
+            // Apo edw kai katw diaxeirisi aitimatwn gia Manager h allous clients
             Request request = firstRequest;
 
             while (true) {
                 switch (request.getType()) {
-                    // Επιστροφή προιόντων
+                    // Epistrofi proiontwn
                     case "GET_PRODUCTS":
                         String storeName = (String) request.getPayload();
                         WorkerConnection worker = MasterServer.getWorkerForStore(storeName);
@@ -67,7 +67,7 @@ public class ClientHandler implements Runnable {
                         Response resp = (Response) worker.getInputStream().readObject();
                         out.writeObject(resp);
                         break;
-                    // Καταχώρηση παραγγελίας
+                    // Kataxwrisi paraggelias
                     case "ADD_ORDER":
                         Order order = (Order) request.getPayload();
                         WorkerConnection worker1 = MasterServer.getWorkerForStore(order.getStoreName());
@@ -79,7 +79,7 @@ public class ClientHandler implements Runnable {
                         Response orderResp = (Response) worker1.getInputStream().readObject();
                         out.writeObject(orderResp);
                         break;
-                    // Ενημέρωση προιόντων
+                    // Enimerwsi proiontwn
                     case "UPDATE_PRODUCTS":
                         String storeName1 = ((UpdateProductRequest) request.getPayload()).getStoreName();
                         WorkerConnection chosenWorker = MasterServer.getWorkerForStore(storeName1);
@@ -91,9 +91,9 @@ public class ClientHandler implements Runnable {
                         Response updateResp = (Response) chosenWorker.getInputStream().readObject();
                         out.writeObject(updateResp);
                         break;
-                    // Προσθήκη καταστήματος
+                    // Prosthiki katastimatos
                     case "ADD_STORE":
-                        // Break εάν δεν υπάρχει διαθέσιμος worker
+                        // Break ean den yparxei diathesimos worker
                         WorkerConnection availableWorker = MasterServer.getAnyAvailableWorker();
                         if (availableWorker == null) {
                             out.writeObject(new Response(false, "Δεν υπάρχει διαθέσιμος Worker", null));
@@ -116,9 +116,8 @@ public class ClientHandler implements Runnable {
                             processStore((Store) payload, out);
                         }
                         break;
-                    // Εύρεση όλων των καταχωρημένων καταστημάτων 
+                    // Evresi olwn twn kataxwrimenwn katastimatwn
                     case "SEARCH_ALL_STORES":
-                        // SearchFilters filtersAllStores = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearchAllStores = new ArrayList<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
                             w.sendRequest(request);
@@ -129,9 +128,8 @@ public class ClientHandler implements Runnable {
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα όλων των καταχωρημένων καταστημάτων", resultsForSearchAllStores));
                         break;
-                    // Εύρεση καταστημάτων σε ακτίνα 5χλμ
+                    // Evresi katastimatwn se aktina 5km
                     case "SEARCH_5KM_RANGE":
-                        // SearchFilters filters = (SearchFilters) request.getPayload();
                         List<Store> resultsForSearch5kmRange = new ArrayList<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
                             w.sendRequest(request);
@@ -142,9 +140,8 @@ public class ClientHandler implements Runnable {
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα κοντινών καταστημάτων", resultsForSearch5kmRange));
                         break;
-                    // Εύρεση καταστημάτων με βάση custom φίλτρων
+                    // Evresi katastimatwn me vasi custom filtra
                     case "FILTER_STORES":
-                        // SearchFilters filterCriteria = (SearchFilters) request.getPayload();
                         List<Store> filteredStores = new ArrayList<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
                             w.sendRequest(request);
@@ -155,7 +152,7 @@ public class ClientHandler implements Runnable {
                         }
                         out.writeObject(new Response(true, "Αποτελέσματα φιλτραρίσματος", filteredStores));
                         break;
-                    // Εμφάνιση εσόδων ανά κατηγορία καταστήματος
+                    // Emfanisi esodwn ana katigoria katastimatos
                     case "CATEGORY_REVENUE":
                         Map<String, Double> totalRevenue = new HashMap<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
@@ -172,7 +169,7 @@ public class ClientHandler implements Runnable {
                         }
                         out.writeObject(new Response(true, " Συγκεντρωτικά έσοδα ανά κατηγορία", totalRevenue));
                         break;
-                    // Εμφάνιση εσόδων ανά κατηγορία προϊόντος
+                    // Emfanisi esodwon ana katigoria proiontos
                     case "CATEGORY_PRODUCT_SALES":
                         String category = (String) request.getPayload();
                         Map<String, Double> finalMap = new HashMap<>();
@@ -193,7 +190,7 @@ public class ClientHandler implements Runnable {
                         finalMap.put("total", total);
                         out.writeObject(new Response(true, " Συγκεντρωτικά έσοδα προϊόντος " + category, finalMap));
                         break;
-                    //  Εμφάνιση πωλήσεων ανά προϊόν
+                    //  Emfanisi polisewn ana proion
                     case "PRODUCT_SALES":
                         Map<String, Map<String, Object>> totalSales = new HashMap<>();
                         for (WorkerConnection w : MasterServer.getWorkers()) {
@@ -215,7 +212,7 @@ public class ClientHandler implements Runnable {
                         out.writeObject(new Response(true, " Πωλήσεις ανά προϊόν", totalSales));
                         break;
 
-                    //  Αξιολόγηση Καταστημάτων
+                    //  Axiologisi katastimatwn
                     case "RATE_STORE":
                         Object payloadRate = request.getPayload();
                         if (payloadRate instanceof RateStoreRequest) {
@@ -234,7 +231,7 @@ public class ClientHandler implements Runnable {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Σύνδεση έκλεισε: " + e.getMessage());
         } finally {
-            // 🛑 Μόνο αν ΔΕΝ είναι Worker κλείνουμε το socket
+            // 🛑 Mono an DEN einai Worker kleinoume to socket
             if (!isWorker) {
                 try {
                     if (socket != null && !socket.isClosed()) {
@@ -261,10 +258,10 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        //  Στείλε το κατάστημα στον Worker
+        //  Stelnoume to katastima ston Worker
         chosenWorker.sendRequest(new Request("ADD_STORE", store));
 
-        //  Καταχώρισε ποιος Worker έχει αυτό το store
+        //  Kataxoroume poios Worker exei auto to store
         MasterServer.registerStoreForWorker(store.getStoreName(), chosenWorker);
 
         System.out.println(" Κατάστημα '" + store.getStoreName() + "' ανατέθηκε στον Worker: " + chosenWorker.getWorkerId());
@@ -277,7 +274,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // Μέθοδος για την αξιολόγηση καταστήματος
+    // Methodos gia tin axiologisi katastimatos
     private void processStoreRating(RateStoreRequest rateRequest, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         String storeName = rateRequest.getStoreName();
         WorkerConnection worker = MasterServer.getWorkerForStore(storeName);

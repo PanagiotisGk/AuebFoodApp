@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Order implements Serializable {
 
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei  to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
 
     private String storeName;
@@ -14,7 +14,7 @@ public class Order implements Serializable {
     private double totalCost;
     private List<Product> productList;
 
-    // Default constructor (για Jackson)
+    // Default constructor (for Jackson)
     public Order() {
     }
 

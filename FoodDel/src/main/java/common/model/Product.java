@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Product implements Serializable {
     
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
     
     private String productName;
@@ -26,12 +26,6 @@ public class Product implements Serializable {
         this.price = price;
     }
 
-    public Product(String productName, double price) {
-        this.productName = productName;
-        this.productType = "unknown";
-        this.availableAmount = 1;
-        this.price = price;
-    }
 
     public String getProductName() {
         return productName;

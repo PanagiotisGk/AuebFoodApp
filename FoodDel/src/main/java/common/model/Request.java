@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Request implements Serializable {
 
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
 
     private String type;    // "ADD_STORE", "SEARCH", "BUY"

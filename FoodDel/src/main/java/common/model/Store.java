@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Store implements Serializable {
 
-    // Χρειάζεται να υπάρχει το ίδιο serialVersionUID στο UI και στο backend
+    // Xreiazetai na yparxei to idio serialVersionUID sto UI kai sto backend
     private static final long serialVersionUID = 1L;
 
     private String storeName;
@@ -17,7 +17,7 @@ public class Store implements Serializable {
     private String storeLogo;
     private List<Product> products;
 
-    // Δεν έρχεται από JSON
+    // Den erxetai apo JSON
     private String priceCategory;
     private double totalRevenue;
 
@@ -38,7 +38,7 @@ public class Store implements Serializable {
         calculatePriceCategory();
     }
 
-    // Συνάρτηση για την προσθήκη προϊόντων σε ένα καταστημα
+    // Synartisi gia tin prosthiki proionton se ena katastima
     public void addProduct(String name, double price) {
         products.add(new Product(name, "unknown", 1, price));
         calculatePriceCategory();
@@ -52,7 +52,7 @@ public class Store implements Serializable {
         return removed;
     }
 
-    // Συνάρτηση για τον υπολογισμό της ακρίβειας του καταστήματος
+    // Synartisi gia ton ypologismo tis akrivias tou katastimatos
     private void calculatePriceCategory() {
         if (products == null || products.isEmpty()) {
             priceCategory = "$";
@@ -104,7 +104,7 @@ public class Store implements Serializable {
     }
 
     public String getPriceCategory() {
-        calculatePriceCategory(); // Κάθε φορά υπολογίζει με βάση τα τρέχοντα προϊόντα
+        calculatePriceCategory(); // Kathe fora ypologizei me vasi ta trexonta proionta
     return priceCategory;
     }
 
@@ -112,9 +112,7 @@ public class Store implements Serializable {
         return totalRevenue;
     }
 
-    // public void addRevenue(double amount) {
-    //     this.totalRevenue += amount;
-    // }
+
 
     public synchronized void addRevenue(double amount) {
         this.totalRevenue += amount;

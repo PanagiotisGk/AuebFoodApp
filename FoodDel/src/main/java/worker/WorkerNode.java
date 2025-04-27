@@ -144,60 +144,7 @@ public class WorkerNode {
                             out.flush();
                             break;
 
-//                        case "REDUCE":
-//                            UpdateProductRequest reduceReq = (UpdateProductRequest) request.getPayload();
-//                            Store targetStore = storeMap.get(reduceReq.getStoreName());
-//
-//                            if (targetStore == null) {
-//                                out.writeObject(new Response(false, " Το κατάστημα δεν υπάρχει", null));
-//                                out.flush();
-//                                break;
-//                            }
-//
-//                            boolean found = false;
-//                            final int MIN_AMOUNT = 5; //  Ελάχιστο όριο ποσότητας
-//
-//                            for (Product p : targetStore.getProducts()) {
-//                                if (p.getProductName().equalsIgnoreCase(reduceReq.getProductName())) {
-//                                    int current = p.getAvailableAmount();
-//                                    int toRemove = reduceReq.getAvailableAmount();
-//
-//                                    if (toRemove <= 0) {
-//                                        out.writeObject(new Response(false, " Η ποσότητα προς αφαίρεση πρέπει να είναι θετική", null));
-//                                        out.flush();
-//                                        break;
-//                                    }
-//
-//                                    if (current < toRemove) {
-//                                        out.writeObject(new Response(false, " Δεν υπάρχει αρκετό απόθεμα για αφαίρεση (" + current + " διαθέσιμα)", null));
-//                                        out.flush();
-//                                        break;
-//                                    }
-//
-//                                    int newAmount = current - toRemove;
-//                                    p.setAvailableAmount(newAmount);
-//
-//                                    System.out.println(" Αφαιρέθηκαν " + toRemove + " τεμάχια από '" + p.getProductName() +
-//                                            "'. Νέα ποσότητα: " + newAmount);
-//
-//                                    if (newAmount <= MIN_AMOUNT) {
-//                                        System.out.println(" ΠΡΟΕΙΔΟΠΟΙΗΣΗ: Το προϊόν '" + p.getProductName() +
-//                                                "' έχει πολύ χαμηλό απόθεμα (" + newAmount + " τεμάχια)");
-//                                    }
-//
-//                                    out.writeObject(new Response(true, " Αφαιρέθηκαν " + toRemove + " τεμάχια από '" + p.getProductName() + "'", null));
-//                                    out.flush();
-//                                    found = true;
-//                                    break;
-//                                }
-//                            }
-//
-//                            if (!found) {
-//                                out.writeObject(new Response(false, " Το προϊόν δεν βρέθηκε στο κατάστημα", null));
-//                                out.flush();
-//                            }
-//
-//                            break;
+
                         case "UPDATE_PRODUCTS":
                             UpdateProductRequest upr = (UpdateProductRequest) request.getPayload();
                             String sName = upr.getStoreName();
@@ -215,7 +162,7 @@ public class WorkerNode {
                                 for (Product p : s1.getProducts()) {
                                     if (p.getProductName().equalsIgnoreCase(upr.getProductName())) {
 
-                                        // Προσθήκη ποσότητας
+                                        // Prosthiki posotitas
                                         if (upr.getAvailableAmount() > 0) {
                                             int prev = p.getAvailableAmount();
                                             int newAmount = prev + upr.getAvailableAmount();
@@ -223,13 +170,13 @@ public class WorkerNode {
                                             System.out.println("Προστέθηκαν " + upr.getAvailableAmount() + " τεμάχια στο προϊόν '" + p.getProductName() + "'. Νέα ποσότητα: " + newAmount);
                                         }
 
-                                        // Ενημέρωση τιμής
+                                        // Enimerwsi timis
                                         if (upr.getPrice() > 0 && p.getPrice() != upr.getPrice()) {
                                             System.out.println("Ενημερώθηκε η τιμή προϊόντος '" + p.getProductName() + "' από " + p.getPrice() + "€ σε " + upr.getPrice() + "€");
                                             p.setPrice(upr.getPrice());
                                         }
 
-                                        // Ενημέρωση τύπου
+                                        // Enimerwsi typou
                                         if (upr.getProductType() != null && !upr.getProductType().equalsIgnoreCase("null") &&
                                                 !p.getProductType().equalsIgnoreCase(upr.getProductType())) {
                                             System.out.println("Ενημερώθηκε ο τύπος προϊόντος '" + p.getProductName() + "' από " + p.getProductType() + " σε " + upr.getProductType());
@@ -424,10 +371,8 @@ public class WorkerNode {
                             Store s = storeMap.get(requestedStore);
 
                             if (s == null) {
-                                out.writeObject(new Response(false, "❌ Το κατάστημα δεν βρέθηκε", null));
+                                out.writeObject(new Response(false, " Το κατάστημα δεν βρέθηκε", null));
                             } else {
-                                // 🔥 Εδώ κάνουμε DEBUG να δούμε τα τρέχοντα προϊόντα
-                                System.out.println("📦 DEBUG - Προϊόντα καταστήματος '" + requestedStore + "':");
                                 for (Product p : s.getProducts()) {
                                     System.out.printf(" - %s (%s) %.2f€, Διαθέσιμα: %d\n",
                                             p.getProductName(), p.getProductType(), p.getPrice(), p.getAvailableAmount());
@@ -445,7 +390,7 @@ public class WorkerNode {
                                     copyProducts.add(copy);
                                 }
 
-                                out.writeObject(new Response(true, "📦 Προϊόντα καταστήματος", copyProducts));
+                                out.writeObject(new Response(true, " Προϊόντα καταστήματος", copyProducts));
                                 out.flush();
                             }
                             
@@ -538,7 +483,7 @@ public class WorkerNode {
         }
     }
 
-    // Συνάρτηση για την μετατροπή απόστασης σε χιλιόμετρα
+    // Sinartisi gia tin metatropi apostasis se k m
     private double distanceInKm(double lat1, double lon1, double lat2, double lon2) {
         double R = 6371.0; // Earth radius in km
         double dLat = Math.toRadians(lat2 - lat1);
