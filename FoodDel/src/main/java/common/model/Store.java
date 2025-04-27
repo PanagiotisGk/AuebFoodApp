@@ -91,6 +91,10 @@ public class Store implements Serializable {
         return stars;
     }
 
+    public String getStarsFormatted() {
+        return String.format("%.1f", stars);
+    }
+
     public int getNoOfVotes() {
         return noOfVotes;
     }
