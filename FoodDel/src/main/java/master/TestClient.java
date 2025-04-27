@@ -60,7 +60,7 @@ public class TestClient {
                             for (Store store : stores) {
                                 System.out.println("\n" + store.getStoreName() + "  " + store.getStoreLogo());
                                 System.out.println("    Κατηγορία: " + store.getFoodCategory());
-                                System.out.println("    Βαθμολογία: " + store.getStars() );
+                                System.out.println("    Βαθμολογία: " + store.getStarsFormatted() );
                                 System.out.println("    Πλήθος ψήφων: " + store.getNoOfVotes() );
                                 System.out.println("  Διαθέσιμα Προϊόντα :");
                                 int j = 1;
@@ -130,7 +130,8 @@ public class TestClient {
                             for (Store store : stores5km) {
                                 System.out.println("\n" + i + ". " + store.getStoreName() + "  " + store.getStoreLogo());
                                 System.out.println("    Κατηγορία: " + store.getFoodCategory());
-                                System.out.println("    Βαθμολογία: " + store.getStars() );
+                                System.out.println("    Βαθμολογία: " + store.getStarsFormatted() );
+                                System.out.println("    Πλήθος ψήφων: " + store.getNoOfVotes() );
                                 System.out.println("  Διαθέσιμα Προϊόντα : ");
                                 int j = 1;
                                 for (Product product : store.getProducts()){
@@ -179,7 +180,8 @@ public class TestClient {
                             for (Store store : filteredStores) {
                                 System.out.println(i + ". " + store.getStoreName());
                                 System.out.println("Κατηγορία: " + store.getFoodCategory());
-                                System.out.println("Βαθμολογία: " + store.getStars() );
+                                System.out.println("Βαθμολογία: " + store.getStarsFormatted() );
+                                System.out.println("Πλήθος ψήφων: " + store.getNoOfVotes() );
                                 System.out.println("Τιμή: " + store.getPriceCategory());
                                 i++;
                             }
