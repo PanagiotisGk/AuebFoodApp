@@ -103,38 +103,67 @@ public class WorkerNode {
                                             store5km.getLongitude());
 
                                     if (distance <= 5) {
-                                        nearbyStores.add(store5km);
+                                        Store liveStore5km = new Store(
+                                            store5km.getStoreName(),
+                                            store5km.getLatitude(),
+                                            store5km.getLongitude(),
+                                            store5km.getFoodCategory(),
+                                            store5km.getStars(),
+                                            store5km.getNoOfVotes(),
+                                            store5km.getStoreLogo(),
+                                            new ArrayList<>(store5km.getProducts())
+                                    );
+                                        nearbyStores.add(liveStore5km);
                                     }
                                 }
-                                System.out.println("Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
-                                Response response = new Response(true, "Καταστήματα σε ακτίνα 5km", nearbyStores);
-                                out.writeObject(response);
                             }
+                            System.out.println("Αποτελέσματα Search σε ακτίνα 5km: " + nearbyStores.size());
+                            Response response = new Response(true, "Καταστήματα σε ακτίνα 5km", nearbyStores);
+                            out.writeObject(response);
+                            out.flush();
+                            
                             out.flush();
                             break;
 
                         case "FILTER_STORES":
-                            System.out.println("📩 Worker έλαβε αίτημα: FILTER_STORES");
+                            System.out.println(" Worker έλαβε αίτημα: FILTER_STORES");
                             SearchFilters filtersForStores = (SearchFilters) request.getPayload();
+                            List<Store> filteredStores = new ArrayList<>();
+                            synchronized (storeMap) {
+                                List<Store> filteredStore = storeMap.values().stream()
+                                        .filter(store ->
+                                                filtersForStores.getFoodCategories() == null ||
+                                                        filtersForStores.getFoodCategories().isEmpty() ||
+                                                        filtersForStores.getFoodCategories().contains(store.getFoodCategory())
+                                        )
+                                        .filter(store ->
+                                                store.getStars() >= filtersForStores.getMinStars()
+                                        )
+                                        .filter(store ->
+                                                filtersForStores.getPriceCategories() == null ||
+                                                        filtersForStores.getPriceCategories().isEmpty() ||
+                                                        filtersForStores.getPriceCategories().contains(store.getPriceCategory())
+                                        )
+                                        .collect(Collectors.toList());
 
-                            List<Store> filteredStores = storeMap.values().stream()
-                                    .filter(store ->
-                                            filtersForStores.getFoodCategories() == null ||
-                                                    filtersForStores.getFoodCategories().isEmpty() ||
-                                                    filtersForStores.getFoodCategories().contains(store.getFoodCategory())
-                                    )
-                                    .filter(store ->
-                                            store.getStars() >= filtersForStores.getMinStars()
-                                    )
-                                    .filter(store ->
-                                            filtersForStores.getPriceCategories() == null ||
-                                                    filtersForStores.getPriceCategories().isEmpty() ||
-                                                    filtersForStores.getPriceCategories().contains(store.getPriceCategory())
-                                    )
-                                    .collect(Collectors.toList());
-
-                            System.out.println("Αποτελέσματα φίλτρων: " + filteredStores.size());
-                            out.writeObject(new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores));
+                                    for (Store st : filteredStore){
+                                        Store liveStore = new Store(
+                                                st.getStoreName(),
+                                                st.getLatitude(),
+                                                st.getLongitude(),
+                                                st.getFoodCategory(),
+                                                st.getStars(),
+                                                st.getNoOfVotes(),
+                                                st.getStoreLogo(),
+                                                new ArrayList<>(st.getProducts())
+                                        );
+                                        filteredStores.add(liveStore);
+                                    }
+                                
+                                    System.out.println("Αποτελέσματα φίλτρων: " + filteredStores.size());
+                                    out.writeObject(new Response(true, "Φιλτραρισμένα καταστήματα", filteredStores));
+                                    out.flush();
+                            }
                             out.flush();
                             break;
 
