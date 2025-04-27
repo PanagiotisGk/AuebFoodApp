@@ -234,20 +234,20 @@ public class ClientHandler implements Runnable {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Σύνδεση έκλεισε: " + e.getMessage());
         } finally {
-            // 🛑 Μόνο αν ΔΕΝ είναι Worker κλείνουμε το socket
+            //  Μόνο αν ΔΕΝ είναι Worker κλείνουμε το socket
             if (!isWorker) {
                 try {
                     if (socket != null && !socket.isClosed()) {
                         socket.close();
-                        System.out.println("🧹 Έκλεισα το socket του ClientHandler: " + socket.getRemoteSocketAddress());
+                        System.out.println(" Έκλεισα το socket του ClientHandler: " + socket.getRemoteSocketAddress());
                     }
                 } catch (IOException e) {
-                    System.out.println("❗ Σφάλμα στο κλείσιμο του socket: " + e.getMessage());
+                    System.out.println(" Σφάλμα στο κλείσιμο του socket: " + e.getMessage());
                 }
             } else {
-                System.out.println("🔵 Worker ClientHandler παραμένει ενεργός.");
+                System.out.println(" Worker ClientHandler παραμένει ενεργός.");
             }
-            System.out.println("🧨 ClientHandler για " + socket.getRemoteSocketAddress() + " τερματίστηκε.");
+            System.out.println(" ClientHandler για " + socket.getRemoteSocketAddress() + " τερματίστηκε.");
         }
     }
 
