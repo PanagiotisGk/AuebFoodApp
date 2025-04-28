@@ -232,7 +232,7 @@ public class ClientHandler implements Runnable {
             System.out.println("Σύνδεση έκλεισε: " + e.getMessage());
         } finally {
 
-            // 🛑 Mono an DEN einai Worker kleinoume to socket
+            // Mono an DEN einai Worker kleinoume to socket
 
             if (!isWorker) {
                 try {

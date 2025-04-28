@@ -185,7 +185,7 @@ public class ManagerApp {
 
                         Response productResp = (Response) in.readObject();
                         Object payload = productResp.getData();
-                        System.out.println("🔍 Έλαβα απάντηση από GET_PRODUCTS:");
+                        System.out.println(" - Έλαβα απάντηση από GET_PRODUCTS:");
                         System.out.println(" - Success: " + productResp.isSuccess());
                         System.out.println(" - Message: " + productResp.getMessage());
                         System.out.println(" - Payload class: " + (payload != null ? payload.getClass().getName() : "null"));
