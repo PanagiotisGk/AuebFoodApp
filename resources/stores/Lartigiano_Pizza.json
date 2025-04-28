@@ -5,7 +5,7 @@
     "foodCategory": "pizzeria",
     "stars": 3.8,
     "noOfVotes": 120,
-    "storeLogo": "/images/Lartigiano-Logo.png",
+    "storeLogo": "lartigiano",
     "products": [
       {
         "productName": "margarita",

@@ -5,7 +5,7 @@
     "foodCategory": "pizzeria",
     "stars": 4.2,
     "noOfVotes": 90,
-    "storeLogo": "/images/Dominos-Logo.png",
+    "storeLogo": "domino",
     "products": [
       {
         "productName": "margarita",

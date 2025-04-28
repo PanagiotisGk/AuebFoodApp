@@ -5,7 +5,7 @@
     "foodCategory": "pizzeria",
     "stars": 4,
     "noOfVotes": 100,
-    "storeLogo": "/images/Pizzafun-logo.png",
+    "storeLogo": "pizzafun",
     "products": [
       {
         "productName": "margarita",
