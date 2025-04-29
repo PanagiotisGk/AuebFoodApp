@@ -30,13 +30,17 @@
         android:fontFamily="@font/zenoldmincho_regular" />
 
     <!-- Button -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnEnterApp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Η απόλαυση ξεκινά με ένα πάτημα!"
         android:layout_marginBottom="24dp"
         android:textColor="@android:color/black"
-        android:backgroundTint="#CCCCCC"/>
+        android:backgroundTint="#CCCCCC"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:cornerRadius="16dp"
+        android:elevation="6dp"/>
 
 </LinearLayout>

@@ -102,6 +102,13 @@ public class EvaluationStoreActivity extends AppCompatActivity {
                             Toast.makeText(this, "Απάντηση: " + message, Toast.LENGTH_LONG).show()
                     );
 
+                    // Refresh data of the stores after the evaluation
+                    fetchAvailableStores();
+
+                    // Clear Fields
+                    edtStoreName.setText("");
+                    edtStars.setText("");
+
                     in.close();
                     out.close();
                     socket.close();
