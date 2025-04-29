@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#343434">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewStores"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="Nearby Stores"/>
+
+    <Button
+        android:id="@+id/btnBackHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Επιστροφή στην Αρχική"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="10dp"
+        android:backgroundTint="#FFFFFF"
+        android:textColor="@android:color/black" />
+
+</LinearLayout>

@@ -1,29 +1,15 @@
-
-# Java
-*.class
-*.jar
-*.war
-*.ear
-*.log
 *.iml
-target/
-build/
-
-# IntelliJ
-.idea/
-*.iml
-out/
-
-# Android/Gradle
-.gradle/
-local.properties
-*.keystore
-*.jks
-build/
-captures/
-.externalNativeBuild/
-.cxx/
-
-# OS files
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 .DS_Store
-Thumbs.db
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#343434">
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_app_logo"
+        android:contentDescription="App Logo"
+        android:layout_marginBottom="35dp" />
+
+    <Button
+        android:id="@+id/btnSearchNearby"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Καταστήματα σε ακτίνα 5km"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#FFFFFF"
+        android:textColor="@android:color/black"
+        android:paddingHorizontal="25dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/btnSearchWithFilters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Αναζήτηση με φίλτρα"
+        android:backgroundTint="#FFFFFF"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="47dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <Button
+        android:id="@+id/btnOrder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Παραγγελία"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#FFFFFF"
+        android:textColor="@android:color/black"
+        android:paddingHorizontal="78dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/btnEvaluationStore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Αξιολόγηση Καταστήματος"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#FFFFFF"
+        android:textColor="@android:color/black"
+        android:paddingHorizontal="29dp"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

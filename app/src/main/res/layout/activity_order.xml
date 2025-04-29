@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="#343434">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Διαθέσιμα Καταστήματα:"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:layout_marginBottom="10dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/zenoldmincho_regular"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerStores"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Available Stores"/>
+
+        <EditText
+            android:id="@+id/edtStoreName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Όνομα Καταστήματος (π.χ. Domino Pizza)"
+            android:textColorHint="@android:color/darker_gray"
+            android:background="@drawable/rounded_edittext"
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/edtProduct1"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Προϊόν (π.χ. special, chef salad)"
+            android:textColorHint="@android:color/darker_gray"
+            android:background="@drawable/rounded_edittext"
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/edtQuantityProduct1"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Ποσότητα (π.χ. 1,2,3)"
+            android:textColorHint="@android:color/darker_gray"
+            android:inputType="number"
+            android:background="@drawable/rounded_edittext"
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/btnAddProduct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Προσθήκη στο Καλάθι"
+            android:layout_gravity="center"
+            android:layout_marginBottom="12dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="10dp"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/txtAddedProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🛒 Καλάθι Προϊόντων:"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"
+            />
+
+        <EditText
+            android:id="@+id/edtCost"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Τιμές (π.χ. $, $$, $$$)"
+            android:textColorHint="@android:color/darker_gray"
+            android:inputType="number"
+            android:background="@drawable/rounded_edittext"
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/btnRegisterOrder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Αποστολή Παραγγελίας"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="12dp"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="@android:color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewRegisterOrder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            android:clipToPadding="false" />
+
+        <Button
+            android:id="@+id/btnBackHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Επιστροφή στην Αρχική"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="10dp"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+</ScrollView>

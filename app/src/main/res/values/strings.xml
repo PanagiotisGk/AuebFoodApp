@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">foodDeliverySystem</string>
+    <string-array name="price_categories">
+        <item>All</item>
+        <item>$</item>
+        <item>$$</item>
+        <item>$$$</item>
+    </string-array>
+</resources>
