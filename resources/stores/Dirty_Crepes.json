@@ -1,0 +1,23 @@
+{
+    "storeName": "Dirty Crepes",
+    "latitude": 37.9922,
+    "longitude": 23.7412,
+    "foodCategory": "crepa",
+    "stars": 4.7,
+    "noOfVotes": 150,
+    "storeLogo": "Dirty",
+    "products": [
+      {
+        "productName": "crepa_almiri",
+        "productType": "crepa",
+        "availableAmount": 100,
+        "price": 3.5
+      },
+      {
+        "productName": "crepa_glikia",
+        "productType": "souvcrepalaki",
+        "availableAmount": 70,
+        "price": 3.5
+      }
+    ]
+  }

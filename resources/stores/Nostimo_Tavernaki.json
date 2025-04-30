@@ -1,0 +1,23 @@
+{
+    "storeName": "Nostimo Tavernaki",
+    "latitude": 37.9922,
+    "longitude": 23.7412,
+    "foodCategory": "souvlaki",
+    "stars": 4.7,
+    "noOfVotes": 150,
+    "storeLogo": "Nostimo",
+    "products": [
+      {
+        "productName": "souvlaki_kotopoulo",
+        "productType": "souvlaki",
+        "availableAmount": 100,
+        "price": 2.5
+      },
+      {
+        "productName": "souvlaki_xoirino",
+        "productType": "souvlaki",
+        "availableAmount": 70,
+        "price": 2.5
+      }
+    ]
+  }
