@@ -29,6 +29,7 @@
         <activity android:name=".FilterStoresActivity" />
         <activity android:name=".OrderActivity" />
         <activity android:name=".EvaluationStoreActivity" />
+        <activity android:name=".CategorySelectionActivity" />
     </application>
 
 </manifest>

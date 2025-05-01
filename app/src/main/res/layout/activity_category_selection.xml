@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#343434">
+
+    <TextView
+        android:id="@+id/txtQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Τι θα ήθελες να φας;"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"
+        android:textColor="#CCCCCC" />
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="2"
+        android:useDefaultMargins="true"
+        android:alignmentMode="alignMargins">
+
+        <!-- Pizzeria -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pizza"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#CCCCCC"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnPizzeria"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/pizza"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Pizzeria" />
+        </LinearLayout>
+
+        <!-- Crepa -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crepa"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#CCCCCC"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnCrepa"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/crepes"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Crepa" />
+        </LinearLayout>
+
+        <!-- Souvlaki -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Souvlaki"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#CCCCCC"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnSouvlaki"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/souvlaki"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Souvlaki" />
+        </LinearLayout>
+
+        <!-- Coffee -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Coffee"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#CCCCCC"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnCoffee"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/coffee"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Coffee" />
+        </LinearLayout>
+
+    </GridLayout>
+
+</LinearLayout>

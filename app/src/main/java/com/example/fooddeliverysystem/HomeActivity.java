@@ -42,7 +42,7 @@ public class HomeActivity extends AppCompatActivity {
         btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(HomeActivity.this, OrderActivity.class));
+                startActivity(new Intent(HomeActivity.this, CategorySelectionActivity.class));
             }
         });
 

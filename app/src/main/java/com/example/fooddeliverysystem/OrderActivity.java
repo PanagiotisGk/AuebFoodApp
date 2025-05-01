@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class OrderActivity extends AppCompatActivity {
     private EditText edtStoreName, edtProduct1, edtQuantityProduct1, edtCost;
     private RecyclerView recyclerStores;
     private StoreAdapter storeAdapter;
+    private String selectedCategory = null;
 
     private Button btnRegisterOrder, btnBackHome, btnAddProduct;
     private TextView txtAddedProducts;
@@ -56,6 +58,8 @@ public class OrderActivity extends AppCompatActivity {
 
         recyclerStores = findViewById(R.id.recyclerStores);
         recyclerStores.setLayoutManager(new LinearLayoutManager(this));
+
+        selectedCategory = getIntent().getStringExtra("CATEGORY_SELECTED");
 
         btnRegisterOrder.setOnClickListener(v -> fetchRegisterOrder());
 
@@ -175,13 +179,29 @@ public class OrderActivity extends AppCompatActivity {
                 out.flush();
 
                 Response response = (Response) in.readObject();
-                List<Store> stores = (List<Store>) response.getData();
+                List<Store> allStores = (List<Store>) response.getData();
+
+                // Φιλτράρισμα με βάση category
+                List<Store> filteredStores = new ArrayList<>();
+                if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                    for (Store store : allStores) {
+                        if (store.getFoodCategory() != null &&
+                                store.getFoodCategory().equalsIgnoreCase(selectedCategory)) {
+                            filteredStores.add(store);
+                        }
+                    }
+                } else {
+                    filteredStores = allStores;
+                }
+
+
+                List<Store> finalStores = filteredStores;
 
                 runOnUiThread(() -> {
-                    if (stores == null || stores.isEmpty()) {
+                    if (finalStores == null || finalStores.isEmpty()) {
                         Toast.makeText(this, "Δεν βρέθηκαν καταστήματα", Toast.LENGTH_SHORT).show();
                     } else {
-                        storeAdapter = new StoreAdapter(stores);
+                        storeAdapter = new StoreAdapter(finalStores);
                         recyclerStores.setAdapter(storeAdapter);
                     }
                 });
@@ -196,6 +216,4 @@ public class OrderActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-
 }
