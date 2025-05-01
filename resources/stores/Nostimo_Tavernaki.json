@@ -1,11 +1,11 @@
 {
     "storeName": "Nostimo Tavernaki",
-    "latitude": 37.9922,
-    "longitude": 23.7412,
+    "latitude": 37.9105,
+    "longitude": 23.6698,
     "foodCategory": "souvlaki",
     "stars": 4.7,
     "noOfVotes": 150,
-    "storeLogo": "Nostimo",
+    "storeLogo": "nostimotavernaki",
     "products": [
       {
         "productName": "souvlaki_kotopoulo",

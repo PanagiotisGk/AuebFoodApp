@@ -1,11 +1,11 @@
 {
     "storeName": "Dirty Crepes",
-    "latitude": 37.9922,
-    "longitude": 23.7412,
+    "latitude": 38.0055,
+    "longitude": 23.7698,
     "foodCategory": "crepa",
     "stars": 4.7,
     "noOfVotes": 150,
-    "storeLogo": "Dirty",
+    "storeLogo": "dirtycrepes",
     "products": [
       {
         "productName": "crepa_almiri",
