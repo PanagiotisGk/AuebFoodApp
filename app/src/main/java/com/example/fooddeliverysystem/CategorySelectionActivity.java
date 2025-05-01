@@ -1,5 +1,6 @@
 package com.example.fooddeliverysystem;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class CategorySelectionActivity extends AppCompatActivity {
 
-    ImageButton btnPizzeria, btnCrepa, btnSouvlaki, btnCoffee;
+    ImageButton btnPizzeria, btnCrepa, btnSouvlaki, btnCoffee, btnBackHome;
     TextView txtQuestion;
 
     @Override
@@ -23,6 +24,7 @@ public class CategorySelectionActivity extends AppCompatActivity {
         btnCrepa = findViewById(R.id.btnCrepa);
         btnSouvlaki = findViewById(R.id.btnSouvlaki);
         btnCoffee = findViewById(R.id.btnCoffee);
+        btnBackHome = findViewById(R.id.btnBackHome);
 
         View.OnClickListener categoryClickListener = view -> {
             String category = "";
@@ -36,6 +38,14 @@ public class CategorySelectionActivity extends AppCompatActivity {
             intent.putExtra("CATEGORY_SELECTED", category);
             startActivity(intent);
         };
+
+        // Return Home Button
+        btnBackHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(CategorySelectionActivity.this, HomeActivity.class));
+            }
+        });
 
         btnPizzeria.setOnClickListener(categoryClickListener);
         btnCrepa.setOnClickListener(categoryClickListener);

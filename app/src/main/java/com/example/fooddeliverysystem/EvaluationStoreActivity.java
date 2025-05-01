@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.TextView;
@@ -25,8 +26,8 @@ import java.util.Map;
 public class EvaluationStoreActivity extends AppCompatActivity {
 
     private EditText edtStoreName, edtStars;
-    private Button btnBackHome, btnRegisterEval;
-
+    private Button btnRegisterEval;
+    private ImageButton btnBackHome;
     private RecyclerView recyclerStores;
 
     private StoreAdapter storeAdapter;

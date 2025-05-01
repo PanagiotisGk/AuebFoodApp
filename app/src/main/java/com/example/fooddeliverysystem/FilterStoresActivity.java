@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,7 +21,8 @@ import java.util.List;
 public class FilterStoresActivity extends AppCompatActivity {
 
     private EditText edtCategory, edtStars, edtPrice;
-    private Button btnSearch, btnBackHome;
+    private Button btnSearch;
+    private ImageButton btnBackHome;
     private RecyclerView recyclerView;
     private StoreAdapter storeAdapter;
 

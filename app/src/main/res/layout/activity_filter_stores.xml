@@ -4,13 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="#343434">
+    android:background="#CCCCCC">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Επέλεξε με βάση τα παρακάτω φίλτρα για να δείς διαθέσιμα μαγαζιά"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:layout_marginBottom="10dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/zenoldmincho_regular"/>
 
         <EditText
             android:id="@+id/edtCategory"
@@ -55,7 +66,7 @@
             android:layout_height="wrap_content"
             android:text="Αναζήτηση"
             android:layout_gravity="center_horizontal"
-            android:backgroundTint="#FFFFFF"
+            android:backgroundTint="#FF9933"
             android:textColor="@android:color/black"
             android:layout_marginStart="82dp"
             android:layout_marginEnd="82dp"
@@ -69,19 +80,16 @@
             android:layout_marginTop="24dp"
             android:clipToPadding="false" />
 
-        <com.google.android.material.button.MaterialButton
+        <ImageButton
             android:id="@+id/btnBackHome"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Επιστροφή στην Αρχική"
-            android:layout_marginTop="24dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_gravity="center"
-            android:paddingVertical="10dp"
-            android:backgroundTint="#FFFFFF"
-            android:textColor="@android:color/black"
-            android:layout_marginStart="52dp"
-            android:layout_marginEnd="52dp"
-            app:cornerRadius="16dp"
-            android:elevation="6dp"/>
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_circle_orange"
+            android:src="@drawable/ic_home"
+            android:scaleType="centerInside"
+            android:contentDescription="Αρχική"
+            android:elevation="6dp" />
     </LinearLayout>
 </ScrollView>

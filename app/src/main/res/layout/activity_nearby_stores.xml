@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="#343434">
+    android:padding="24dp"
+    android:background="#CCCCCC">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewStores"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="Nearby Stores"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBackHome"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Επιστροφή στην Αρχική"
-        android:layout_marginBottom="10dp"
-        android:layout_gravity="center"
-        android:paddingVertical="10dp"
-        android:backgroundTint="#FFFFFF"
-        android:textColor="@android:color/black"
-        android:layout_marginStart="52dp"
-        android:layout_marginEnd="52dp"
-        app:cornerRadius="16dp"
-        android:elevation="6dp"/>
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-</LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewStores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="Nearby Stores"
+            android:nestedScrollingEnabled="false" />
+
+        <ImageButton
+            android:id="@+id/btnBackHome"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_circle_orange"
+            android:src="@drawable/ic_home"
+            android:scaleType="centerInside"
+            android:contentDescription="Αρχική"
+            android:elevation="6dp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.TextView;
@@ -30,7 +31,8 @@ public class OrderActivity extends AppCompatActivity {
     private StoreAdapter storeAdapter;
     private String selectedCategory = null;
 
-    private Button btnRegisterOrder, btnBackHome, btnAddProduct;
+    private Button btnRegisterOrder, btnAddProduct;
+    private ImageButton btnBackHome;
     private TextView txtAddedProducts;
     private Map<String, Integer> productsOrdered = new HashMap<>();
     private static final String SERVER_ADDRESS = "192.168.1.46";
