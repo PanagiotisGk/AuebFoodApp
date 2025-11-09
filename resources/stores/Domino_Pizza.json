@@ -1,0 +1,23 @@
+{
+    "storeName": "Domino Pizza",
+    "latitude": 37.9922,
+    "longitude": 23.7412,
+    "foodCategory": "pizzeria",
+    "stars": 4.2,
+    "noOfVotes": 90,
+    "storeLogo": "domino",
+    "products": [
+      {
+        "productName": "margarita",
+        "productType": "pizza",
+        "availableAmount": 100,
+        "price": 8.8
+      },
+      {
+        "productName": "special",
+        "productType": "pizza",
+        "availableAmount": 70,
+        "price": 4.2
+      }
+    ]
+  }

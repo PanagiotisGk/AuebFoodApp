@@ -1,0 +1,94 @@
+[
+{
+  "storeName": "Pizza Fun",
+  "latitude": 37.9794,
+  "longitude": 23.7166,
+  "foodCategory": "pizzeria",
+  "stars": 4,
+  "noOfVotes": 100,
+  "storeLogo": "/images/Pizzafun-logo.png",
+  "products": [
+    {
+      "productName": "margarita",
+      "productType": "pizza",
+      "availableAmount": 100,
+      "price": 8.5
+    },
+    {
+      "productName": "salad",
+      "productType": "salad",
+      "availableAmount": 50,
+      "price": 4.0
+    }
+  ]
+},
+{
+  "storeName": "Domino Pizza",
+  "latitude": 37.9922,
+  "longitude": 23.7412,
+  "foodCategory": "pizzeria",
+  "stars": 4.2,
+  "noOfVotes": 90,
+  "storeLogo": "/images/Dominos-Logo.png",
+  "products": [
+    {
+      "productName": "margarita",
+      "productType": "pizza",
+      "availableAmount": 100,
+      "price": 8.8
+    },
+    {
+      "productName": "special",
+      "productType": "pizza",
+      "availableAmount": 70,
+      "price": 4.2
+    }
+  ]
+},
+{
+  "storeName": "Lartigiano Pizza",
+  "latitude": 37.9716,
+  "longitude": 23.7258,
+  "foodCategory": "pizzeria",
+  "stars": 3.8,
+  "noOfVotes": 120,
+  "storeLogo": "/images/Lartigiano-Logo.png",
+  "products": [
+    {
+      "productName": "margarita",
+      "productType": "pizza",
+      "availableAmount": 50,
+      "price": 9
+    },
+    {
+      "productName": "chef salad",
+      "productType": "salad",
+      "availableAmount": 70,
+      "price": 5.0
+    }
+  ]
+},
+{
+  "storeName": "Mikel Coffee",
+  "latitude": 38.0450,
+  "longitude": 23.8100,
+  "foodCategory": "coffee",
+  "stars": 4.8,
+  "noOfVotes": 130,
+  "storeLogo": "/images/Lartigiano-Logo.png",
+  "products": [
+    {
+      "productName": "chicken sandwich",
+      "productType": "sandwich",
+      "availableAmount": 50,
+      "price": 6
+    },
+    {
+      "productName": "chef salad",
+      "productType": "salad",
+      "availableAmount": 70,
+      "price": 5.0
+    }
+  ]
+}
+]

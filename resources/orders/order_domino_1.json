@@ -1,0 +1,8 @@
+{
+  "storeName": "Domino Pizza",
+  "productsOrdered": {
+    "special": 2,
+    "margarita": 1
+  },
+  "totalCost": 21.8
+}

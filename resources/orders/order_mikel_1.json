@@ -1,0 +1,8 @@
+{
+  "storeName": "Mikel Coffee",
+  "productsOrdered": {
+    "chicken sandwich": 1,
+    "chef salad": 2
+  },
+  "totalCost": 16.0
+}

@@ -27,3 +27,9 @@ captures/
 # OS files
 .DS_Store
 Thumbs.db
+.vs/VSWorkspaceState.json
+.vs/AuebFoodApp/FileContentIndex/7113f975-d550-40b8-80cf-0a92ab5c6224.vsidx
+.vs/AuebFoodApp/v17/.wsuo
+.vs/AuebFoodApp/v17/DocumentLayout.json
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
