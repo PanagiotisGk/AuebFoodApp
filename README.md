@@ -32,11 +32,11 @@ It demonstrates scalable task distribution, real-time analytics, and fault-toler
 
 ## 👨‍💻 Team Members  (with Alphabetical Order)
 
-- Gkogkakis Panagiotis Christos**
+- Gkogkakis Panagiotis Christos
 
 - Nikolaou Vasiliki
 
-- Panagopoulos Dimitris
+- Panagopoulos Dimitrios
 
 ---
 
