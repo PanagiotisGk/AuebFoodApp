@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#CCCCCC">
+
+    <TextView
+        android:id="@+id/txtQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Τι θα ήθελες να φας;"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"
+        android:textColor="@android:color/black" />
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="2"
+        android:useDefaultMargins="true"
+        android:alignmentMode="alignMargins">
+
+        <!-- Pizzeria -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pizza"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnPizzeria"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/pizza"
+                android:contentDescription="Pizzeria" />
+        </LinearLayout>
+
+        <!-- Crepa -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crepa"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnCrepa"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/crepes"
+                android:contentDescription="Crepa" />
+        </LinearLayout>
+
+        <!-- Souvlaki -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Souvlaki"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnSouvlaki"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/souvlaki"
+                android:contentDescription="Souvlaki" />
+        </LinearLayout>
+
+        <!-- Coffee -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Coffee"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnCoffee"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@drawable/coffee"
+                android:contentDescription="Coffee" />
+        </LinearLayout>
+
+    </GridLayout>
+
+    <ImageButton
+        android:id="@+id/btnBackHome"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_circle_orange"
+        android:src="@drawable/ic_home"
+        android:scaleType="centerInside"
+        android:contentDescription="Αρχική"
+        android:elevation="6dp" />
+
+</LinearLayout>

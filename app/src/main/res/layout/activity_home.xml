@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#CCCCCC">
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_app_logo"
+        android:contentDescription="App Logo"
+        android:layout_marginBottom="35dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSearchNearby"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Καταστήματα σε ακτίνα 5km"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#FF9933"
+        app:cornerRadius="16dp"
+        android:elevation="6dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSearchWithFilters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Αναζήτηση με φίλτρα"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#FF9933"
+        app:cornerRadius="16dp"
+        android:elevation="6dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOrder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Παραγγελία"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#FF9933"
+        app:cornerRadius="16dp"
+        android:elevation="6dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEvaluationStore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Αξιολόγηση Καταστήματος"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#FF9933"
+        app:cornerRadius="16dp"
+        android:elevation="6dp" />
+
+</LinearLayout>

@@ -1,35 +1,15 @@
-
-# Java
-*.class
-*.jar
-*.war
-*.ear
-*.log
 *.iml
-target/
-build/
-
-# IntelliJ
-.idea/
-*.iml
-out/
-
-# Android/Gradle
-.gradle/
-local.properties
-*.keystore
-*.jks
-build/
-captures/
-.externalNativeBuild/
-.cxx/
-
-# OS files
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 .DS_Store
-Thumbs.db
-.vs/VSWorkspaceState.json
-.vs/AuebFoodApp/FileContentIndex/7113f975-d550-40b8-80cf-0a92ab5c6224.vsidx
-.vs/AuebFoodApp/v17/.wsuo
-.vs/AuebFoodApp/v17/DocumentLayout.json
-.vs/ProjectSettings.json
-.vs/slnx.sqlite
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
